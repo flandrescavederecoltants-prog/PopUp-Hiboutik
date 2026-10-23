@@ -1,4 +1,3 @@
-```javascript
 (()=>{const start=()=>{const img="https://flandrescavederecoltants.hiboutik.com/shop/image.php?img=big_1074-1.jpg",shop="https://flandrescavederecoltants.hiboutik.com/shop/";
 let n=(+sessionStorage.getItem("pageCount")||0)+1;sessionStorage.setItem("pageCount",n);
 if(n%4===1&&!document.getElementById("customPopupOverlay")){
@@ -16,4 +15,3 @@ o.innerHTML=`<div style="position:absolute;top:50%;left:50%;transform:translate(
 document.body.append(b,o);b.onclick=()=>o.style.display="block";o.onclick=e=>{if(e.target===o||e.target.id==="ctC")o.style.display="none";if(e.target.id==="ctS"){let d=Object.fromEntries(f.map(x=>[x,document.getElementById("ct_"+x).value]));d.to_email="flandres.cavederecoltants@gmail.com";emailjs.send("service_ooppol1","template_z7j8s5j",d).then(()=>{alert("✅ Message envoyé !");o.style.display="none"}).catch(()=>alert("❌ Erreur lors de l'envoi"))}}};
 document.head.append(s);
 };if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start()})();
-```
