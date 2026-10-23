@@ -1,4 +1,3 @@
-```javascript
 (()=>{const start=()=>{const img="https://flandrescavederecoltants.hiboutik.com/shop/image.php?img=big_1074-1.jpg",shop="https://flandrescavederecoltants.hiboutik.com/shop/";
 let n=(+sessionStorage.getItem("pageCount")||0)+1;sessionStorage.setItem("pageCount",n);
 if(n%4===1&&!document.getElementById("customPopupOverlay")){
@@ -17,4 +16,3 @@ document.body.append(b,o);b.onclick=()=>o.style.display="block";o.onclick=e=>{if
 document.head.append(s);
 };
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",start);else start()})();
-```
