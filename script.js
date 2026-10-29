@@ -1,34 +1,52 @@
 
 (() => {
+  "use strict";
+
   const start = () => {
 
-    // =====================================
-    // CONFIGURATION
-    // =====================================
+    // ==========================================
+    // 1. CONFIGURATION GÉNÉRALE
+    // ==========================================
 
-    const img = "https://flandrescavederecoltants.hiboutik.com/shop/image.php?img=big_1074-1.jpg";
-    const wine = "https://flandrescavederecoltants.hiboutik.com/shop/?page=product&id=1074";
-    const shop = "https://flandrescavederecoltants.hiboutik.com/shop/?page=products";
+    const BASE =
+      "https://flandrescavederecoltants-prog.github.io/PopUp-Hiboutik/";
 
-    // =====================================
-    // POPUP VIN DE LA SEMAINE
-    // =====================================
+    const iconUrl =
+      BASE + "flandres-icone-ronde-512.png?v=3";
 
-    let n = (+sessionStorage.getItem("pageCount") || 0) + 1;
-    sessionStorage.setItem("pageCount", n);
+    const installUrl =
+      BASE + "boutique.html?installer=1";
+
+    const wineImage =
+      "https://flandrescavederecoltants.hiboutik.com/shop/image.php?img=big_1074-1.jpg";
+
+    const wineUrl =
+      "https://flandrescavederecoltants.hiboutik.com/shop/?page=product&id=1074";
+
+    const shopUrl =
+      "https://flandrescavederecoltants.hiboutik.com/shop/?page=products";
+
+
+    // ==========================================
+    // 2. POPUP : 1 SEMAINE / 1 VIN
+    // ==========================================
+
+    let pageCount =
+      Number(sessionStorage.getItem("pageCount") || 0) + 1;
+
+    sessionStorage.setItem("pageCount", pageCount);
 
     if (
-      n % 4 === 1 &&
+      pageCount % 4 === 1 &&
       !document.getElementById("customPopupOverlay")
     ) {
+
       const popup = document.createElement("div");
       popup.id = "customPopupOverlay";
 
       popup.style.cssText = `
         position:fixed;
         inset:0;
-        width:100%;
-        height:100%;
         background:#0009;
         z-index:999999;
         display:flex;
@@ -68,10 +86,10 @@
 
           #pvImage {
             display:block;
-            width:auto;
-            height:auto;
             max-width:100%;
             max-height:calc(90vh - 40px);
+            width:auto;
+            height:auto;
             object-fit:contain;
             border:2px solid #ff5722;
             border-radius:8px;
@@ -82,13 +100,13 @@
             width:55%;
             display:flex;
             flex-direction:column;
-            justify-content:center;
             align-items:center;
+            justify-content:center;
+            padding:20px 15px;
             background:#111;
             color:white;
-            padding:20px 15px;
-            box-sizing:border-box;
             text-align:center;
+            box-sizing:border-box;
             min-width:0;
           }
 
@@ -104,8 +122,6 @@
             display:flex;
             flex-direction:row;
             gap:8px;
-            justify-content:center;
-            align-items:center;
             width:100%;
           }
 
@@ -122,19 +138,14 @@
             white-space:normal;
           }
 
-          #pvA:hover, #pvS:hover {
-            background:#e64a19;
-          }
-
           #pvX {
             position:absolute;
             top:8px;
             right:12px;
             font-size:24px;
-            cursor:pointer;
             color:white;
+            cursor:pointer;
             z-index:10;
-            line-height:1;
           }
 
           @media(max-width:600px) {
@@ -152,7 +163,6 @@
             }
 
             #pvImage {
-              max-width:100%;
               max-height:45vh;
             }
 
@@ -170,12 +180,6 @@
               font-size:12px;
               padding:12px 6px;
             }
-
-            #pvX {
-              top:8px;
-              right:10px;
-              text-shadow:0 1px 4px #000;
-            }
           }
         </style>
 
@@ -183,7 +187,7 @@
           <div id="pvImageZone">
             <img
               id="pvImage"
-              src="${img}"
+              src="${wineImage}"
               alt="Le vin de la semaine"
             >
           </div>
@@ -213,54 +217,78 @@
 
       setTimeout(() => popup.remove(), 20000);
 
-      popup.addEventListener("click", e => {
-        if (e.target.id === "pvA") {
-          location.href = wine;
+      popup.addEventListener("click", event => {
+        if (event.target.id === "pvA") {
+          window.location.href = wineUrl;
         }
 
-        if (e.target.id === "pvS") {
-          location.href = shop;
+        if (event.target.id === "pvS") {
+          window.location.href = shopUrl;
         }
 
-        if (e.target.id === "pvX") {
+        if (
+          event.target.id === "pvX" ||
+          event.target === popup
+        ) {
           popup.remove();
         }
       });
     }
 
-    // =====================================
-    // ICONE DE LA BOUTIQUE
-    // =====================================
 
-    const iconUrl = "https://flandrescavederecoltants-prog.github.io/PopUp-Hiboutik/Icone%20Flandres%20Cave%20de%20R%C3%A9coltants.png";
+    // ==========================================
+    // 3. LOGO DE LA BOUTIQUE
+    // ==========================================
 
-    function setIcon(rel, sizes) {
-      let link = document.querySelector(`link[rel="${rel}"]`);
+    // Corrige l'icône affichée par le navigateur.
+    // Pour le raccourci Android, le pont GitHub
+    // et son manifeste restent indispensables.
+
+    function setIcon(rel, url, sizes) {
+      let link =
+        document.querySelector(`link[rel="${rel}"]`);
+
       if (!link) {
         link = document.createElement("link");
         link.rel = rel;
         document.head.appendChild(link);
       }
-      link.href = iconUrl;
-      if (sizes) link.sizes = sizes;
+
+      link.href = url;
+
+      if (sizes) {
+        link.setAttribute("sizes", sizes);
+      }
     }
 
-    setIcon("icon", "512x512");
-    setIcon("apple-touch-icon", "180x180");
+    setIcon("icon", iconUrl, "512x512");
 
-    // =====================================
-    // INVITATION ECRAN D'ACCUEIL (MOBILE)
-    // Le raccourci avec logo se crée depuis le pont GitHub.
-    // =====================================
+    setIcon(
+      "apple-touch-icon",
+      BASE + "flandres-icone-ronde-180.png?v=3",
+      "180x180"
+    );
 
-    const installUrl = "https://flandrescavederecoltants-prog.github.io/PopUp-Hiboutik/boutique.html?installer=1";
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    // ==========================================
+    // 4. INVITATION À INSTALLER LE RACCOURCI
+    // ==========================================
+
+    const isMobile =
+      /Android|iPhone|iPad|iPod/i.test(
+        navigator.userAgent
+      );
+
     const isStandalone =
-      window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: standalone)")
+        .matches ||
       window.navigator.standalone === true;
 
-    const alreadyAddedKey = "flandresHomeIconAlreadyAdded";
-    const shownThisVisitKey = "flandresHomeIconShownThisSession";
+    const alreadyAddedKey =
+      "flandresHomeIconAlreadyAdded";
+
+    const shownThisVisitKey =
+      "flandresHomeIconShownThisSession";
 
     if (
       isMobile &&
@@ -269,15 +297,24 @@
       sessionStorage.getItem(shownThisVisitKey) !== "yes" &&
       !document.getElementById("flandresInstallInvite")
     ) {
-      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+      const isIOS =
+        /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
       const instructions = isIOS
-        ? "Ouvrez notre page d'installation dans Safari, puis utilisez Partager → Sur l'écran d'accueil."
-        : "Ouvrez notre page d'installation, puis utilisez le menu de votre navigateur → Ajouter à l'écran d'accueil. Votre raccourci affichera notre logo Flandres.";
+        ? "Ouvrez notre page d'installation dans Safari, puis choisissez Partager → Sur l'écran d'accueil."
+        : "Ouvrez notre page d'installation, puis utilisez le menu de votre navigateur → Ajouter à l'écran d'accueil.";
 
       const invite = document.createElement("div");
+
       invite.id = "flandresInstallInvite";
+
       invite.setAttribute("role", "dialog");
-      invite.setAttribute("aria-label", "Installer le raccourci Flandres");
+      invite.setAttribute(
+        "aria-label",
+        "Installer le raccourci Flandres"
+      );
+
       invite.style.cssText = `
         position:fixed;
         bottom:16px;
@@ -297,69 +334,166 @@
       `;
 
       invite.innerHTML = `
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-          <img src="${iconUrl}" alt="Logo Flandres"
-            style="width:54px;height:54px;object-fit:contain;border-radius:10px;flex-shrink:0;">
+        <div style="
+          display:flex;
+          align-items:center;
+          gap:12px;
+          margin-bottom:10px;
+        ">
+          <img
+            src="${iconUrl}"
+            alt="Logo Flandres"
+            style="
+              width:54px;
+              height:54px;
+              object-fit:contain;
+              border-radius:10px;
+              flex-shrink:0;
+            "
+          >
+
           <div>
-            <strong style="font-size:15px">🍷 Flandres Cave de Récoltants</strong>
-            <div>Retrouvez notre boutique sur l'écran d'accueil avec notre vrai logo !</div>
+            <strong style="font-size:15px">
+              🍷 Flandres Cave de Récoltants
+            </strong>
+
+            <div>
+              Retrouvez notre boutique sur votre
+              écran d'accueil avec notre vrai logo !
+            </div>
           </div>
         </div>
-        <p style="margin:0 0 12px">${instructions}</p>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;">
-          <button type="button" id="flandresLater"
-            style="background:#444;color:white;border:0;border-radius:6px;padding:10px;cursor:pointer;">
+
+        <p style="margin:0 0 12px">
+          ${instructions}
+        </p>
+
+        <div style="
+          display:flex;
+          flex-wrap:wrap;
+          gap:8px;
+          justify-content:flex-end;
+        ">
+          <button
+            type="button"
+            id="flandresLater"
+            style="
+              background:#444;
+              color:white;
+              border:0;
+              border-radius:6px;
+              padding:10px;
+              cursor:pointer;
+            "
+          >
             Plus tard
           </button>
-          <button type="button" id="flandresAlready"
-            style="background:#444;color:white;border:0;border-radius:6px;padding:10px;cursor:pointer;">
+
+          <button
+            type="button"
+            id="flandresAlready"
+            style="
+              background:#444;
+              color:white;
+              border:0;
+              border-radius:6px;
+              padding:10px;
+              cursor:pointer;
+            "
+          >
             Déjà ajouté ✓
           </button>
-          <a id="flandresInstallLink" href="${installUrl}"
-            style="display:inline-block;background:#ff5722;color:white;border:0;border-radius:6px;padding:10px;text-decoration:none;font-weight:bold;text-align:center;">
+
+          <a
+            id="flandresInstallLink"
+            href="${installUrl}"
+            style="
+              display:inline-block;
+              background:#ff5722;
+              color:white;
+              border-radius:6px;
+              padding:10px;
+              text-decoration:none;
+              font-weight:bold;
+              text-align:center;
+            "
+          >
             🍷 Installer notre logo
           </a>
         </div>
       `;
 
-      // Une invitation par session ; le popup du vin est prioritaire.
       const showInvite = () => {
-        if (document.getElementById("flandresInstallInvite")) return;
-        if (document.getElementById("customPopupOverlay")) {
+
+        if (
+          document.getElementById(
+            "flandresInstallInvite"
+          )
+        ) {
+          return;
+        }
+
+        // Le popup du vin passe en priorité.
+        if (
+          document.getElementById(
+            "customPopupOverlay"
+          )
+        ) {
           setTimeout(showInvite, 1500);
           return;
         }
-        if (localStorage.getItem(alreadyAddedKey) === "yes") return;
 
-        sessionStorage.setItem(shownThisVisitKey, "yes");
+        if (
+          localStorage.getItem(alreadyAddedKey) === "yes"
+        ) {
+          return;
+        }
+
+        sessionStorage.setItem(
+          shownThisVisitKey,
+          "yes"
+        );
+
         document.body.appendChild(invite);
 
-        invite.querySelector("#flandresLater").addEventListener("click", () => {
-          invite.remove();
-        });
-        invite.querySelector("#flandresAlready").addEventListener("click", () => {
-          localStorage.setItem(alreadyAddedKey, "yes");
-          invite.remove();
-        });
+        invite.querySelector("#flandresLater")
+          .addEventListener("click", () => {
+            invite.remove();
+          });
+
+        invite.querySelector("#flandresAlready")
+          .addEventListener("click", () => {
+            localStorage.setItem(
+              alreadyAddedKey,
+              "yes"
+            );
+            invite.remove();
+          });
       };
 
       setTimeout(showInvite, 4000);
     }
 
-    // =====================================
-    // FORMULAIRE DE CONTACT
-    // =====================================
 
-    if (document.getElementById("customContactButton")) {
+    // ==========================================
+    // 5. FORMULAIRE DE CONTACT EMAILJS
+    // ==========================================
+
+    if (
+      document.getElementById(
+        "customContactButton"
+      )
+    ) {
       return;
     }
 
-    const script = document.createElement("script");
+    const emailScript =
+      document.createElement("script");
 
-    script.src =
+    emailScript.src =
       "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
 
-    script.onload = () => {
+    emailScript.onload = () => {
 
       emailjs.init("0Oia31xdzY1Jhf2Bq");
 
@@ -373,7 +507,7 @@
       ];
 
       const button = document.createElement("div");
-      const contactOverlay = document.createElement("div");
+      const overlay = document.createElement("div");
 
       button.id = "customContactButton";
       button.textContent = "📩 Nous contacter";
@@ -384,21 +518,20 @@
         top:50%;
         transform:translateY(-50%);
         background:#ff5722;
-        color:#fff;
+        color:white;
         padding:12px 18px;
         border-radius:8px 0 0 8px;
         cursor:grab;
         z-index:1000001;
         font-weight:bold;
         touch-action:none !important;
-        -ms-touch-action:none;
         user-select:none;
         -webkit-user-select:none;
         -webkit-touch-callout:none;
         box-sizing:border-box;
       `;
 
-      contactOverlay.style.cssText = `
+      overlay.style.cssText = `
         position:fixed;
         inset:0;
         background:#0009;
@@ -406,13 +539,14 @@
         z-index:1000002;
       `;
 
-      contactOverlay.innerHTML = `
+      overlay.innerHTML = `
         <div style="
           position:absolute;
           top:50%;
           left:50%;
           transform:translate(-50%,-50%);
-          background:#fff;
+          background:white;
+          color:#222;
           padding:20px;
           border-radius:10px;
           width:90%;
@@ -427,10 +561,10 @@
             Contactez-nous
           </h2>
 
-          ${fields.slice(0, 5).map(x => `
+          ${fields.slice(0, 5).map(field => `
             <input
-              id="ct_${x}"
-              placeholder="${x}"
+              id="ct_${field}"
+              placeholder="${field}"
               style="
                 width:100%;
                 margin:5px 0;
@@ -457,37 +591,43 @@
             justify-content:space-between;
             margin-top:10px;
           ">
-
-            <button id="ctC" style="
-              padding:10px;
-              background:#999;
-              color:#fff;
-              border:0;
-              border-radius:5px;
-              cursor:pointer;
-            ">
+            <button
+              id="ctC"
+              style="
+                padding:10px;
+                background:#999;
+                color:white;
+                border:0;
+                border-radius:5px;
+                cursor:pointer;
+              "
+            >
               Annuler
             </button>
 
-            <button id="ctS" style="
-              padding:10px;
-              background:#ff5722;
-              color:#fff;
-              border:0;
-              border-radius:5px;
-              cursor:pointer;
-            ">
+            <button
+              id="ctS"
+              style="
+                padding:10px;
+                background:#ff5722;
+                color:white;
+                border:0;
+                border-radius:5px;
+                cursor:pointer;
+              "
+            >
               Envoyer
             </button>
           </div>
         </div>
       `;
 
-      document.body.append(button, contactOverlay);
+      document.body.append(button, overlay);
 
-      // =====================================
-      // DÉPLACEMENT TACTILE ET SOURIS
-      // =====================================
+
+      // ========================================
+      // 6. BOUTON DE CONTACT DÉPLAÇABLE
+      // ========================================
 
       const positionKey = "contactButtonPosition";
 
@@ -517,6 +657,7 @@
       }
 
       function savePosition() {
+
         try {
           localStorage.setItem(
             positionKey,
@@ -525,10 +666,13 @@
               y: parseFloat(button.style.top)
             })
           );
-        } catch (e) {}
+        } catch (error) {
+          // Le bouton reste utilisable
+          // même si le stockage est bloqué.
+        }
       }
 
-      // Restaurer la position précédente
+      // Restaurer sa dernière position.
 
       try {
         const saved = JSON.parse(
@@ -542,14 +686,17 @@
         ) {
           moveButton(saved.x, saved.y);
         }
-      } catch (e) {}
+      } catch (error) {
+        // Aucune position enregistrée.
+      }
 
       let drag = null;
       let ignoreClick = false;
 
       function beginDrag(x, y, type) {
 
-        const rect = button.getBoundingClientRect();
+        const rect =
+          button.getBoundingClientRect();
 
         drag = {
           type,
@@ -593,180 +740,285 @@
         button.style.cursor = "grab";
       }
 
-      // =====================================
-      // GESTION SPÉCIFIQUE SMARTPHONE
-      // =====================================
+
+      // ========================================
+      // 7. GESTION TACTILE SMARTPHONE
+      // ========================================
 
       let activeTouchId = null;
 
-      button.addEventListener("touchstart", e => {
+      button.addEventListener(
+        "touchstart",
+        event => {
 
-        if (drag || e.touches.length !== 1) return;
+          if (
+            drag ||
+            event.touches.length !== 1
+          ) {
+            return;
+          }
 
-        const t = e.changedTouches[0];
-        activeTouchId = t.identifier;
+          const touch =
+            event.changedTouches[0];
 
-        beginDrag(t.clientX, t.clientY, "touch");
-        button.style.cursor = "grabbing";
+          activeTouchId = touch.identifier;
 
-      }, { passive: true });
-
-      button.addEventListener("touchmove", e => {
-
-        if (!drag || drag.type !== "touch") return;
-
-        const t = Array.from(e.changedTouches).find(
-          touch => touch.identifier === activeTouchId
-        );
-
-        if (!t) return;
-
-        updateDrag(t.clientX, t.clientY);
-
-        if (drag.moved && e.cancelable) {
-          e.preventDefault();
-        }
-
-      }, { passive: false });
-
-      button.addEventListener("touchend", e => {
-
-        if (!drag || drag.type !== "touch") return;
-
-        const t = Array.from(e.changedTouches).find(
-          touch => touch.identifier === activeTouchId
-        );
-
-        if (!t) return;
-
-        const moved = drag.moved;
-        endDrag();
-        activeTouchId = null;
-
-        if (!moved) {
-          contactOverlay.style.display = "block";
-          ignoreClick = true;
-        }
-
-        if (e.cancelable) e.preventDefault();
-
-      }, { passive: false });
-
-      button.addEventListener("touchcancel", () => {
-
-        if (drag && drag.type === "touch") {
-          endDrag();
-        }
-
-        activeTouchId = null;
-      });
-
-      // =====================================
-      // GESTION SOURIS ORDINATEUR
-      // =====================================
-
-      button.addEventListener("mousedown", e => {
-
-        if (e.button !== 0) return;
-
-        beginDrag(e.clientX, e.clientY, "mouse");
-        button.style.cursor = "grabbing";
-
-        e.preventDefault();
-      });
-
-      document.addEventListener("mousemove", e => {
-
-        if (!drag || drag.type !== "mouse") return;
-
-        updateDrag(e.clientX, e.clientY);
-      });
-
-      document.addEventListener("mouseup", () => {
-
-        if (drag && drag.type === "mouse") {
-          endDrag();
-        }
-      });
-
-      // =====================================
-      // CLIC NORMAL : OUVRIR LE FORMULAIRE
-      // =====================================
-
-      button.addEventListener("click", e => {
-
-        if (ignoreClick) {
-          ignoreClick = false;
-          e.preventDefault();
-          return;
-        }
-
-        if (!drag) {
-          contactOverlay.style.display = "block";
-        }
-      });
-
-      // Garder l'onglet dans l'écran
-
-      window.addEventListener("resize", () => {
-
-        if (button.style.left) {
-          const rect = button.getBoundingClientRect();
-          moveButton(rect.left, rect.top);
-          savePosition();
-        }
-      });
-
-      // =====================================
-      // ENVOI DU FORMULAIRE EMAILJS
-      // =====================================
-
-      contactOverlay.addEventListener("click", e => {
-
-        if (
-          e.target === contactOverlay ||
-          e.target.id === "ctC"
-        ) {
-          contactOverlay.style.display = "none";
-        }
-
-        if (e.target.id === "ctS") {
-
-          const data = Object.fromEntries(
-            fields.map(x => [
-              x,
-              document.getElementById("ct_" + x).value
-            ])
+          beginDrag(
+            touch.clientX,
+            touch.clientY,
+            "touch"
           );
 
-          data.to_email =
-            "flandres.cavederecoltants@gmail.com";
+          button.style.cursor = "grabbing";
 
-          emailjs.send(
-            "service_ooppol1",
-            "template_z7j8s5j",
-            data
-          )
-          .then(() => {
-            alert("✅ Message envoyé !");
-            contactOverlay.style.display = "none";
-          })
-          .catch(() => {
-            alert("❌ Erreur lors de l'envoi");
-          });
+        },
+        { passive: true }
+      );
+
+      button.addEventListener(
+        "touchmove",
+        event => {
+
+          if (
+            !drag ||
+            drag.type !== "touch"
+          ) {
+            return;
+          }
+
+          const touch =
+            Array.from(event.changedTouches)
+              .find(item =>
+                item.identifier === activeTouchId
+              );
+
+          if (!touch) return;
+
+          updateDrag(
+            touch.clientX,
+            touch.clientY
+          );
+
+          if (
+            drag.moved &&
+            event.cancelable
+          ) {
+            event.preventDefault();
+          }
+
+        },
+        { passive: false }
+      );
+
+      button.addEventListener(
+        "touchend",
+        event => {
+
+          if (
+            !drag ||
+            drag.type !== "touch"
+          ) {
+            return;
+          }
+
+          const touch =
+            Array.from(event.changedTouches)
+              .find(item =>
+                item.identifier === activeTouchId
+              );
+
+          if (!touch) return;
+
+          const moved = drag.moved;
+
+          endDrag();
+          activeTouchId = null;
+
+          if (!moved) {
+            overlay.style.display = "block";
+            ignoreClick = true;
+          }
+
+          if (event.cancelable) {
+            event.preventDefault();
+          }
+
+        },
+        { passive: false }
+      );
+
+      button.addEventListener(
+        "touchcancel",
+        () => {
+
+          if (
+            drag &&
+            drag.type === "touch"
+          ) {
+            endDrag();
+          }
+
+          activeTouchId = null;
         }
-      });
+      );
+
+
+      // ========================================
+      // 8. GESTION SOURIS ORDINATEUR
+      // ========================================
+
+      button.addEventListener(
+        "mousedown",
+        event => {
+
+          if (event.button !== 0) return;
+
+          beginDrag(
+            event.clientX,
+            event.clientY,
+            "mouse"
+          );
+
+          button.style.cursor = "grabbing";
+
+          event.preventDefault();
+        }
+      );
+
+      document.addEventListener(
+        "mousemove",
+        event => {
+
+          if (
+            !drag ||
+            drag.type !== "mouse"
+          ) {
+            return;
+          }
+
+          updateDrag(
+            event.clientX,
+            event.clientY
+          );
+        }
+      );
+
+      document.addEventListener(
+        "mouseup",
+        () => {
+
+          if (
+            drag &&
+            drag.type === "mouse"
+          ) {
+            endDrag();
+          }
+        }
+      );
+
+      button.addEventListener(
+        "click",
+        event => {
+
+          if (ignoreClick) {
+            ignoreClick = false;
+            event.preventDefault();
+            return;
+          }
+
+          if (!drag) {
+            overlay.style.display = "block";
+          }
+        }
+      );
+
+      window.addEventListener(
+        "resize",
+        () => {
+
+          if (button.style.left) {
+
+            const rect =
+              button.getBoundingClientRect();
+
+            moveButton(
+              rect.left,
+              rect.top
+            );
+
+            savePosition();
+          }
+        }
+      );
+
+
+      // ========================================
+      // 9. ENVOI DU MESSAGE EMAILJS
+      // ========================================
+
+      overlay.addEventListener(
+        "click",
+        event => {
+
+          if (
+            event.target === overlay ||
+            event.target.id === "ctC"
+          ) {
+            overlay.style.display = "none";
+            return;
+          }
+
+          if (event.target.id === "ctS") {
+
+            const data =
+              Object.fromEntries(
+                fields.map(field => [
+                  field,
+                  document.getElementById(
+                    "ct_" + field
+                  ).value
+                ])
+              );
+
+            data.to_email =
+              "flandres.cavederecoltants@gmail.com";
+
+            emailjs.send(
+              "service_ooppol1",
+              "template_z7j8s5j",
+              data
+            )
+            .then(() => {
+              alert("✅ Message envoyé !");
+              overlay.style.display = "none";
+            })
+            .catch(() => {
+              alert("❌ Erreur lors de l'envoi");
+            });
+          }
+        }
+      );
     };
 
-    document.head.appendChild(script);
+    document.head.appendChild(emailScript);
   };
 
+
+  // ==========================================
+  // 10. DÉMARRAGE DU SCRIPT
+  // ==========================================
+
   if (document.readyState === "loading") {
+
     document.addEventListener(
       "DOMContentLoaded",
       start
     );
+
   } else {
+
     start();
+
   }
+
 })();
