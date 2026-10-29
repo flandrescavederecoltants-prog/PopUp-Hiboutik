@@ -1,20 +1,31 @@
 
 (() => {
   const start = () => {
-    // CONFIGURATION
+
+    // ==========================================
+    // CONFIGURATION DU VIN DE LA SEMAINE
+    // ==========================================
+
     const img = "https://flandrescavederecoltants.hiboutik.com/shop/image.php?img=big_1074-1.jpg";
     const wine = "https://flandrescavederecoltants.hiboutik.com/shop/?page=product&id=1074";
     const shop = "https://flandrescavederecoltants.hiboutik.com/shop/?page=products";
 
-    // POPUP : UNE FOIS TOUTES LES 4 VISITES DE PAGES
+    // ==========================================
+    // POPUP VIN DE LA SEMAINE
+    // ==========================================
+
     let n = (+sessionStorage.getItem("pageCount") || 0) + 1;
     sessionStorage.setItem("pageCount", n);
 
-    if (n % 4 === 1 && !document.getElementById("customPopupOverlay")) {
-      const o = document.createElement("div");
-      o.id = "customPopupOverlay";
+    if (
+      n % 4 === 1 &&
+      !document.getElementById("customPopupOverlay")
+    ) {
 
-      o.style.cssText = `
+      const popup = document.createElement("div");
+      popup.id = "customPopupOverlay";
+
+      popup.style.cssText = `
         position:fixed;
         inset:0;
         width:100%;
@@ -28,7 +39,7 @@
         box-sizing:border-box;
       `;
 
-      o.innerHTML = `
+      popup.innerHTML = `
         <style>
           #pvBox {
             position:relative;
@@ -205,39 +216,42 @@
         </div>
       `;
 
-      document.body.appendChild(o);
+      document.body.appendChild(popup);
 
-      // FERMETURE AUTOMATIQUE APRÈS 20 SECONDES
-      setTimeout(() => o.remove(), 20000);
+      // Fermeture automatique après 20 secondes
+      setTimeout(() => popup.remove(), 20000);
 
-      // ACTIONS DES BOUTONS
-      o.addEventListener("click", e => {
-        const target = e.target;
-
-        if (target.id === "pvA") {
+      popup.addEventListener("click", e => {
+        if (e.target.id === "pvA") {
           location.href = wine;
         }
 
-        if (target.id === "pvS") {
+        if (e.target.id === "pvS") {
           location.href = shop;
         }
 
-        if (target.id === "pvX") {
-          o.remove();
+        if (e.target.id === "pvX") {
+          popup.remove();
         }
       });
     }
 
+    // ==========================================
     // FORMULAIRE DE CONTACT EMAILJS
-    if (document.getElementById("customContactButton")) return;
+    // ==========================================
 
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
+    if (document.getElementById("customContactButton")) {
+      return;
+    }
 
-    s.onload = () => {
+    const script = document.createElement("script");
+    script.src = "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
+
+    script.onload = () => {
+
       emailjs.init("0Oia31xdzY1Jhf2Bq");
 
-      const f = [
+      const fields = [
         "nom",
         "prenom",
         "email",
@@ -246,13 +260,13 @@
         "message"
       ];
 
-      const b = document.createElement("div");
-      const o = document.createElement("div");
+      const button = document.createElement("div");
+      const contactOverlay = document.createElement("div");
 
-      b.id = "customContactButton";
-      b.textContent = "📩 Nous contacter";
+      button.id = "customContactButton";
+      button.textContent = "📩 Nous contacter";
 
-      b.style.cssText = `
+      button.style.cssText = `
         position:fixed;
         right:0;
         top:50%;
@@ -261,12 +275,16 @@
         color:#fff;
         padding:12px 18px;
         border-radius:8px 0 0 8px;
-        cursor:pointer;
+        cursor:grab;
         z-index:999999;
         font-weight:bold;
+        touch-action:none;
+        user-select:none;
+        -webkit-user-select:none;
+        box-sizing:border-box;
       `;
 
-      o.style.cssText = `
+      contactOverlay.style.cssText = `
         position:fixed;
         inset:0;
         background:#0009;
@@ -274,7 +292,7 @@
         z-index:999999;
       `;
 
-      o.innerHTML = `
+      contactOverlay.innerHTML = `
         <div style="
           position:absolute;
           top:50%;
@@ -295,7 +313,7 @@
             Contactez-nous
           </h2>
 
-          ${f.slice(0, 5).map(x => `
+          ${fields.slice(0, 5).map(x => `
             <input
               id="ct_${x}"
               placeholder="${x}"
@@ -352,49 +370,233 @@
         </div>
       `;
 
-      document.body.append(b, o);
+      document.body.append(button, contactOverlay);
 
-      b.onclick = () => {
-        o.style.display = "block";
-      };
+      // ==========================================
+      // ONGLET FLOTTANT DÉPLAÇABLE
+      // SOURIS + ÉCRAN TACTILE
+      // ==========================================
 
-      o.onclick = e => {
-        if (e.target === o || e.target.id === "ctC") {
-          o.style.display = "none";
+      const positionKey = "contactButtonPosition";
+
+      const clamp = (value, min, max) =>
+        Math.max(min, Math.min(value, max));
+
+      function positionButton(x, y) {
+        const maxX = Math.max(
+          0,
+          window.innerWidth - button.offsetWidth
+        );
+
+        const maxY = Math.max(
+          0,
+          window.innerHeight - button.offsetHeight
+        );
+
+        button.style.transform = "none";
+        button.style.right = "auto";
+
+        button.style.left =
+          clamp(x, 0, maxX) + "px";
+
+        button.style.top =
+          clamp(y, 0, maxY) + "px";
+      }
+
+      // Récupération de la position mémorisée
+      let savedPosition = null;
+
+      try {
+        savedPosition = JSON.parse(
+          localStorage.getItem(positionKey)
+        );
+      } catch (e) {
+        savedPosition = null;
+      }
+
+      if (
+        savedPosition &&
+        Number.isFinite(savedPosition.x) &&
+        Number.isFinite(savedPosition.y)
+      ) {
+        positionButton(
+          savedPosition.x,
+          savedPosition.y
+        );
+      }
+
+      let drag = null;
+      let suppressClick = false;
+
+      // Début du déplacement
+      button.addEventListener("pointerdown", e => {
+
+        if (
+          e.pointerType === "mouse" &&
+          e.button !== 0
+        ) {
+          return;
+        }
+
+        const rect = button.getBoundingClientRect();
+
+        drag = {
+          id: e.pointerId,
+          startX: e.clientX,
+          startY: e.clientY,
+          left: rect.left,
+          top: rect.top,
+          moved: false
+        };
+
+        button.setPointerCapture(e.pointerId);
+        button.style.cursor = "grabbing";
+      });
+
+      // Déplacement souris ou doigt
+      button.addEventListener("pointermove", e => {
+
+        if (!drag || e.pointerId !== drag.id) {
+          return;
+        }
+
+        const dx = e.clientX - drag.startX;
+        const dy = e.clientY - drag.startY;
+
+        if (Math.hypot(dx, dy) > 6) {
+          drag.moved = true;
+        }
+
+        if (!drag.moved) {
+          return;
+        }
+
+        positionButton(
+          drag.left + dx,
+          drag.top + dy
+        );
+      });
+
+      // Fin du déplacement
+      function finishDrag(e) {
+
+        if (!drag || e.pointerId !== drag.id) {
+          return;
+        }
+
+        if (drag.moved) {
+
+          suppressClick = true;
+
+          try {
+            localStorage.setItem(
+              positionKey,
+              JSON.stringify({
+                x: parseFloat(button.style.left),
+                y: parseFloat(button.style.top)
+              })
+            );
+          } catch (error) {
+            // Le déplacement fonctionne même
+            // si le stockage est indisponible.
+          }
+        }
+
+        drag = null;
+        button.style.cursor = "grab";
+      }
+
+      button.addEventListener(
+        "pointerup",
+        finishDrag
+      );
+
+      button.addEventListener(
+        "pointercancel",
+        finishDrag
+      );
+
+      // Simple clic ou appui : ouvrir le formulaire
+      button.addEventListener("click", e => {
+
+        if (suppressClick) {
+          suppressClick = false;
+          e.preventDefault();
+          return;
+        }
+
+        contactOverlay.style.display = "block";
+      });
+
+      // Repositionnement lors d'un changement
+      // de taille ou d'orientation de l'écran
+      window.addEventListener("resize", () => {
+
+        if (button.style.left) {
+          const rect = button.getBoundingClientRect();
+
+          positionButton(
+            rect.left,
+            rect.top
+          );
+        }
+      });
+
+      // ==========================================
+      // GESTION DU FORMULAIRE DE CONTACT
+      // ==========================================
+
+      contactOverlay.addEventListener("click", e => {
+
+        if (
+          e.target === contactOverlay ||
+          e.target.id === "ctC"
+        ) {
+          contactOverlay.style.display = "none";
         }
 
         if (e.target.id === "ctS") {
-          const d = Object.fromEntries(
-            f.map(x => [
+
+          const data = Object.fromEntries(
+            fields.map(x => [
               x,
               document.getElementById("ct_" + x).value
             ])
           );
 
-          d.to_email = "flandres.cavederecoltants@gmail.com";
+          data.to_email =
+            "flandres.cavederecoltants@gmail.com";
 
           emailjs.send(
             "service_ooppol1",
             "template_z7j8s5j",
-            d
+            data
           )
           .then(() => {
             alert("✅ Message envoyé !");
-            o.style.display = "none";
+            contactOverlay.style.display = "none";
           })
           .catch(() => {
             alert("❌ Erreur lors de l'envoi");
           });
         }
-      };
+      });
     };
 
-    document.head.appendChild(s);
+    document.head.appendChild(script);
   };
 
+  // ==========================================
+  // DÉMARRAGE DU SCRIPT
+  // ==========================================
+
   if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", start);
+    document.addEventListener(
+      "DOMContentLoaded",
+      start
+    );
   } else {
     start();
   }
+
 })();
