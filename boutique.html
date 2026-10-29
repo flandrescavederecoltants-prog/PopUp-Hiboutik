@@ -3,25 +3,25 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-        content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Flandres Cave de Récoltants</title>
 
-  <link rel="icon" type="image/png"
-        href="./Icone%20Flandres%20Cave%20de%20R%C3%A9coltants.png">
+  <link rel="icon"
+        type="image/png"
+        href="./flandres-icone-ronde-192.png?v=3">
 
   <link rel="apple-touch-icon"
-        href="./Icone%20Flandres%20Cave%20de%20R%C3%A9coltants.png">
+        sizes="180x180"
+        href="./flandres-icone-ronde-180.png?v=3">
 
-  <link rel="manifest" href="./boutique.webmanifest">
+  <link rel="manifest"
+        href="./boutique.webmanifest?v=3">
 
   <meta name="theme-color" content="#17120f">
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
@@ -54,9 +54,7 @@
       margin: 20px 0 12px;
     }
 
-    p {
-      line-height: 1.6;
-    }
+    p { line-height: 1.6; }
 
     .instructions {
       margin: 25px 0;
@@ -96,7 +94,7 @@
 
     <img
       class="logo"
-      src="./Icone%20Flandres%20Cave%20de%20R%C3%A9coltants.png"
+      src="./flandres-icone-ronde-512.png?v=3"
       alt="Logo Flandres Cave de Récoltants">
 
     <div id="installation">
@@ -114,13 +112,16 @@
         <div>3. Confirmez l'ajout de notre logo</div>
       </div>
 
-      <a class="bouton" id="boutonInstalle"
-         href="https://flandrescavederecoltants.hiboutik.com/shop/">
+      <a
+        class="bouton"
+        id="boutonInstalle"
+        href="https://flandrescavederecoltants.hiboutik.com/shop/">
         J'ai ajouté le raccourci ✓
       </a>
 
-      <a class="bouton secondaire"
-         href="https://flandrescavederecoltants.hiboutik.com/shop/">
+      <a
+        class="bouton secondaire"
+        href="https://flandrescavederecoltants.hiboutik.com/shop/">
         Continuer vers la boutique
       </a>
 
@@ -134,8 +135,9 @@
       <h1>Bienvenue dans votre cave 🍷</h1>
       <p>Ouverture de la boutique…</p>
 
-      <a class="bouton"
-         href="https://flandrescavederecoltants.hiboutik.com/shop/">
+      <a
+        class="bouton"
+        href="https://flandrescavederecoltants.hiboutik.com/shop/">
         Ouvrir la boutique
       </a>
     </div>
@@ -146,24 +148,27 @@
     const boutique =
       "https://flandrescavederecoltants.hiboutik.com/shop/";
 
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(
+      window.location.search
+    );
 
     const raccourciInstalle =
-      localStorage.getItem("flandresRaccourciInstalle") === "oui";
+      localStorage.getItem("flandresRaccourciInstalle")
+      === "oui";
 
     const modeInstallation = params.has("installer");
 
     if (raccourciInstalle && !modeInstallation) {
       document.getElementById("installation").hidden = true;
       document.getElementById("redirection").hidden = false;
-
       window.location.replace(boutique);
     }
 
     document.getElementById("boutonInstalle")
       .addEventListener("click", function () {
         localStorage.setItem(
-          "flandresRaccourciInstalle", "oui"
+          "flandresRaccourciInstalle",
+          "oui"
         );
       });
   </script>
