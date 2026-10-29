@@ -1,27 +1,42 @@
 
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
 
   <title>Flandres Cave de Récoltants</title>
 
-  <link rel="icon"
-        type="image/png"
-        href="./flandres-icone-ronde-192.png?v=3">
+  <!-- Nouveau logo rond -->
+  <link
+    rel="icon"
+    type="image/png"
+    href="./flandres-icone-ronde-192.png?v=3"
+  >
 
-  <link rel="apple-touch-icon"
-        sizes="180x180"
-        href="./flandres-icone-ronde-180.png?v=3">
+  <link
+    rel="apple-touch-icon"
+    sizes="180x180"
+    href="./flandres-icone-ronde-180.png?v=3"
+  >
 
-  <link rel="manifest"
-        href="./boutique.webmanifest?v=3">
+  <!-- Configuration du raccourci -->
+  <link
+    rel="manifest"
+    href="./boutique.webmanifest?v=4"
+  >
 
   <meta name="theme-color" content="#17120f">
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
@@ -42,8 +57,10 @@
     }
 
     .logo {
+      display: block;
       width: 130px;
       height: 130px;
+      margin: 0 auto;
       object-fit: contain;
       border-radius: 20px;
     }
@@ -54,7 +71,9 @@
       margin: 20px 0 12px;
     }
 
-    p { line-height: 1.6; }
+    p {
+      line-height: 1.6;
+    }
 
     .instructions {
       margin: 25px 0;
@@ -90,15 +109,22 @@
 </head>
 
 <body>
+
   <main class="contenu">
 
+    <!-- Notre nouveau logo rond -->
     <img
       class="logo"
       src="./flandres-icone-ronde-512.png?v=3"
-      alt="Logo Flandres Cave de Récoltants">
+      alt="Logo Flandres Cave de Récoltants"
+    >
 
+    <!-- Page d'installation -->
     <div id="installation">
-      <h1>Votre cave à portée de main 🍷</h1>
+
+      <h1>
+        Votre cave à portée de main 🍷
+      </h1>
 
       <p>
         Ajoutez Flandres Cave de Récoltants
@@ -106,22 +132,38 @@
       </p>
 
       <div class="instructions">
-        <strong>Sur Firefox Android :</strong>
-        <div>1. Appuyez sur le menu ⋮</div>
-        <div>2. Choisissez « Ajouter à l'écran d'accueil »</div>
-        <div>3. Confirmez l'ajout de notre logo</div>
+
+        <strong>
+          Sur Firefox Android :
+        </strong>
+
+        <div>
+          1. Appuyez sur le menu ⋮
+        </div>
+
+        <div>
+          2. Choisissez
+          « Ajouter à l'écran d'accueil »
+        </div>
+
+        <div>
+          3. Confirmez l'ajout de notre logo
+        </div>
+
       </div>
 
       <a
         class="bouton"
         id="boutonInstalle"
-        href="https://flandrescavederecoltants.hiboutik.com/shop/">
+        href="https://flandrescavederecoltants.hiboutik.com/shop/"
+      >
         J'ai ajouté le raccourci ✓
       </a>
 
       <a
         class="bouton secondaire"
-        href="https://flandrescavederecoltants.hiboutik.com/shop/">
+        href="https://flandrescavederecoltants.hiboutik.com/shop/"
+      >
         Continuer vers la boutique
       </a>
 
@@ -129,48 +171,151 @@
         L'installation est facultative.
         Vous pouvez toujours visiter notre boutique.
       </p>
+
     </div>
 
+    <!-- Message pendant la redirection -->
     <div id="redirection" hidden>
-      <h1>Bienvenue dans votre cave 🍷</h1>
-      <p>Ouverture de la boutique…</p>
+
+      <h1>
+        Bienvenue dans votre cave 🍷
+      </h1>
+
+      <p>
+        Ouverture de la boutique…
+      </p>
 
       <a
         class="bouton"
-        href="https://flandrescavederecoltants.hiboutik.com/shop/">
+        href="https://flandrescavederecoltants.hiboutik.com/shop/"
+      >
         Ouvrir la boutique
       </a>
+
     </div>
 
   </main>
 
   <script>
-    const boutique =
-      "https://flandrescavederecoltants.hiboutik.com/shop/";
+    (() => {
+      "use strict";
 
-    const params = new URLSearchParams(
-      window.location.search
-    );
+      // =====================================
+      // 1. ADRESSE DE LA BOUTIQUE
+      // =====================================
 
-    const raccourciInstalle =
-      localStorage.getItem("flandresRaccourciInstalle")
-      === "oui";
+      const boutique =
+        "https://flandrescavederecoltants.hiboutik.com/shop/";
 
-    const modeInstallation = params.has("installer");
+      // =====================================
+      // 2. PARAMÈTRES DE L'ADRESSE
+      // =====================================
 
-    if (raccourciInstalle && !modeInstallation) {
-      document.getElementById("installation").hidden = true;
-      document.getElementById("redirection").hidden = false;
-      window.location.replace(boutique);
-    }
+      const params = new URLSearchParams(
+        window.location.search
+      );
 
-    document.getElementById("boutonInstalle")
-      .addEventListener("click", function () {
-        localStorage.setItem(
-          "flandresRaccourciInstalle",
-          "oui"
+      // ?installer=1 :
+      // Affiche volontairement les instructions.
+
+      const modeInstallation =
+        params.get("installer") === "1";
+
+      // ?ouvrir=1 :
+      // Ouvre directement Hiboutik.
+      // C'est l'adresse réservée au raccourci.
+
+      const modeRaccourci =
+        params.get("ouvrir") === "1";
+
+      // =====================================
+      // 3. MÉMORISATION DE L'INSTALLATION
+      // =====================================
+
+      let raccourciInstalle = false;
+
+      try {
+        raccourciInstalle =
+          localStorage.getItem(
+            "flandresRaccourciInstalle"
+          ) === "oui";
+      } catch (erreur) {
+        // Le raccourci doit rester fonctionnel
+        // même si le stockage est indisponible.
+      }
+
+      // =====================================
+      // 4. DÉTECTION DU MODE APPLICATION
+      // =====================================
+
+      const ouvertEnApplication =
+        window.matchMedia(
+          "(display-mode: standalone)"
+        ).matches ||
+        window.navigator.standalone === true;
+
+      // =====================================
+      // 5. REDIRECTION
+      // =====================================
+
+      // Ordre de priorité :
+      //
+      // ?ouvrir=1    -> Toujours Hiboutik.
+      // ?installer=1 -> Toujours instructions.
+      // Application  -> Hiboutik.
+      // Déjà installé -> Hiboutik.
+      // Sinon         -> Instructions.
+
+      const doitRediriger =
+        modeRaccourci ||
+        (
+          !modeInstallation &&
+          (
+            ouvertEnApplication ||
+            raccourciInstalle
+          )
         );
-      });
+
+      if (doitRediriger) {
+
+        document.getElementById(
+          "installation"
+        ).hidden = true;
+
+        document.getElementById(
+          "redirection"
+        ).hidden = false;
+
+        window.location.replace(boutique);
+      }
+
+      // =====================================
+      // 6. BOUTON DE CONFIRMATION
+      // =====================================
+
+      const boutonInstalle =
+        document.getElementById(
+          "boutonInstalle"
+        );
+
+      boutonInstalle.addEventListener(
+        "click",
+        () => {
+
+          try {
+            localStorage.setItem(
+              "flandresRaccourciInstalle",
+              "oui"
+            );
+          } catch (erreur) {
+            // La navigation reste possible.
+          }
+
+        }
+      );
+
+    })();
   </script>
+
 </body>
 </html>
