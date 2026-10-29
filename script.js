@@ -229,6 +229,204 @@
     }
 
     // =====================================
+    // ICONE DE LA BOUTIQUE
+    // =====================================
+
+    const iconUrl = "https://flandrescavederecoltants-prog.github.io/PopUp-Hiboutik/Icone%20Flandres%20Cave%20de%20R%C3%A9coltants.png";
+
+    function setIcon(rel, sizes) {
+      let link = document.querySelector(`link[rel="${rel}"]`);
+      if (!link) {
+        link = document.createElement("link");
+        link.rel = rel;
+        document.head.appendChild(link);
+      }
+      link.href = iconUrl;
+      if (sizes) link.sizes = sizes;
+    }
+
+    setIcon("icon", "512x512");
+    setIcon("apple-touch-icon", "180x180");
+
+    // =====================================
+    // INVITATION ECRAN D'ACCUEIL (MOBILE)
+    // =====================================
+
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true;
+
+    const alreadyAddedKey = "flandresHomeIconAlreadyAdded";
+    const shownThisVisitKey = "flandresHomeIconShownThisSession";
+
+    if (
+      isMobile &&
+      !isStandalone &&
+      localStorage.getItem(alreadyAddedKey) !== "yes" &&
+      sessionStorage.getItem(shownThisVisitKey) !== "yes" &&
+      !document.getElementById("flandresInstallInvite")
+    ) {
+
+      const ua = navigator.userAgent;
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+      const isFirefox = /Firefox|FxiOS/i.test(ua);
+      const isChrome = /Chrome|CriOS/i.test(ua) && !isFirefox;
+
+      let instructions;
+
+      if (isIOS) {
+        instructions =
+          "Sur iPhone : ouvrez cette boutique dans Safari, touchez Partager (carré avec flèche), puis « Sur l’écran d’accueil » et « Ajouter ».";
+      } else if (isFirefox) {
+        instructions =
+          "Sur Firefox Android : ouvrez le menu ⋮, puis choisissez « Ajouter à l’écran d’accueil » (le libellé peut varier).";
+      } else if (isChrome) {
+        instructions =
+          "Sur Chrome Android : ouvrez le menu ⋮, puis « Ajouter à l’écran d’accueil » ou « Installer l’application ».";
+      } else {
+        instructions =
+          "Ouvrez le menu de votre navigateur et choisissez « Ajouter à l’écran d’accueil » si cette option est disponible.";
+      }
+
+      const invite = document.createElement("div");
+
+      invite.id = "flandresInstallInvite";
+      invite.setAttribute("role", "dialog");
+      invite.setAttribute(
+        "aria-label",
+        "Ajouter la boutique à l'écran d'accueil"
+      );
+
+      invite.style.cssText = `
+        position:fixed;
+        bottom:16px;
+        left:12px;
+        right:12px;
+        z-index:999998;
+        max-width:430px;
+        margin:0 auto;
+        background:#171717;
+        color:white;
+        border:1px solid #ff5722;
+        border-radius:14px;
+        box-shadow:0 6px 25px #0008;
+        padding:14px;
+        font:14px/1.45 Arial,sans-serif;
+        box-sizing:border-box;
+      `;
+
+      invite.innerHTML = `
+        <div style="
+          display:flex;
+          align-items:center;
+          gap:12px;
+          margin-bottom:10px;
+        ">
+          <img
+            src="${iconUrl}"
+            alt="Logo Flandres"
+            style="
+              width:54px;
+              height:54px;
+              object-fit:contain;
+              border-radius:10px;
+              flex-shrink:0;
+            "
+          >
+
+          <div>
+            <strong style="font-size:15px">
+              🍷 Flandres Cave de Récoltants
+            </strong>
+            <div>
+              Retrouvez notre boutique sur votre écran d’accueil !
+            </div>
+          </div>
+        </div>
+
+        <p style="margin:0 0 12px">
+          ${instructions}
+        </p>
+
+        <div style="
+          display:flex;
+          flex-wrap:wrap;
+          gap:8px;
+          justify-content:flex-end;
+        ">
+          <button
+            type="button"
+            id="flandresLater"
+            style="
+              background:#444;
+              color:white;
+              border:0;
+              border-radius:6px;
+              padding:10px;
+              cursor:pointer;
+            "
+          >
+            Plus tard
+          </button>
+
+          <button
+            type="button"
+            id="flandresAlready"
+            style="
+              background:#ff5722;
+              color:white;
+              border:0;
+              border-radius:6px;
+              padding:10px;
+              cursor:pointer;
+            "
+          >
+            Déjà ajouté ✓
+          </button>
+        </div>
+      `;
+
+      // Une seule invitation par session.
+      // Le popup du vin reste prioritaire.
+
+      const showInvite = () => {
+
+        if (document.getElementById("flandresInstallInvite")) {
+          return;
+        }
+
+        if (document.getElementById("customPopupOverlay")) {
+          setTimeout(showInvite, 1500);
+          return;
+        }
+
+        if (localStorage.getItem(alreadyAddedKey) === "yes") {
+          return;
+        }
+
+        sessionStorage.setItem(shownThisVisitKey, "yes");
+        document.body.appendChild(invite);
+
+        invite
+          .querySelector("#flandresLater")
+          .addEventListener("click", () => {
+            invite.remove();
+          });
+
+        invite
+          .querySelector("#flandresAlready")
+          .addEventListener("click", () => {
+            localStorage.setItem(alreadyAddedKey, "yes");
+            invite.remove();
+          });
+      };
+
+      setTimeout(showInvite, 4000);
+    }
+
+    // =====================================
     // FORMULAIRE DE CONTACT
     // =====================================
 
@@ -237,7 +435,9 @@
     }
 
     const script = document.createElement("script");
-    script.src = "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
+
+    script.src =
+      "https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js";
 
     script.onload = () => {
 
@@ -375,6 +575,7 @@
         Math.max(min, Math.min(value, max));
 
       function moveButton(x, y) {
+
         const maxX = Math.max(
           0,
           window.innerWidth - button.offsetWidth
@@ -408,6 +609,7 @@
       }
 
       // Restaurer la position précédente
+
       try {
         const saved = JSON.parse(
           localStorage.getItem(positionKey)
@@ -426,6 +628,7 @@
       let ignoreClick = false;
 
       function beginDrag(x, y, type) {
+
         const rect = button.getBoundingClientRect();
 
         drag = {
@@ -439,6 +642,7 @@
       }
 
       function updateDrag(x, y) {
+
         if (!drag) return;
 
         const dx = x - drag.startX;
@@ -457,6 +661,7 @@
       }
 
       function endDrag() {
+
         if (!drag) return;
 
         if (drag.moved) {
@@ -475,6 +680,7 @@
       let activeTouchId = null;
 
       button.addEventListener("touchstart", e => {
+
         if (drag || e.touches.length !== 1) return;
 
         const t = e.changedTouches[0];
@@ -482,9 +688,11 @@
 
         beginDrag(t.clientX, t.clientY, "touch");
         button.style.cursor = "grabbing";
+
       }, { passive: true });
 
       button.addEventListener("touchmove", e => {
+
         if (!drag || drag.type !== "touch") return;
 
         const t = Array.from(e.changedTouches).find(
@@ -498,9 +706,11 @@
         if (drag.moved && e.cancelable) {
           e.preventDefault();
         }
+
       }, { passive: false });
 
       button.addEventListener("touchend", e => {
+
         if (!drag || drag.type !== "touch") return;
 
         const t = Array.from(e.changedTouches).find(
@@ -519,12 +729,15 @@
         }
 
         if (e.cancelable) e.preventDefault();
+
       }, { passive: false });
 
       button.addEventListener("touchcancel", () => {
+
         if (drag && drag.type === "touch") {
           endDrag();
         }
+
         activeTouchId = null;
       });
 
@@ -533,6 +746,7 @@
       // =====================================
 
       button.addEventListener("mousedown", e => {
+
         if (e.button !== 0) return;
 
         beginDrag(e.clientX, e.clientY, "mouse");
@@ -542,12 +756,14 @@
       });
 
       document.addEventListener("mousemove", e => {
+
         if (!drag || drag.type !== "mouse") return;
 
         updateDrag(e.clientX, e.clientY);
       });
 
       document.addEventListener("mouseup", () => {
+
         if (drag && drag.type === "mouse") {
           endDrag();
         }
@@ -558,6 +774,7 @@
       // =====================================
 
       button.addEventListener("click", e => {
+
         if (ignoreClick) {
           ignoreClick = false;
           e.preventDefault();
@@ -570,7 +787,9 @@
       });
 
       // Garder l'onglet dans l'écran
+
       window.addEventListener("resize", () => {
+
         if (button.style.left) {
           const rect = button.getBoundingClientRect();
           moveButton(rect.left, rect.top);
