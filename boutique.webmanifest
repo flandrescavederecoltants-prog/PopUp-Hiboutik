@@ -2,7 +2,7 @@
 {
   "name": "Flandres Cave de Récoltants",
   "short_name": "Flandres Cave",
-  "start_url": "./boutique.html?ouvrir=1",
+  "start_url": "./ouvrir-boutique.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#17120f",
