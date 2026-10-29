@@ -3,52 +3,169 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1">
 
   <title>Flandres Cave de Récoltants</title>
 
   <link rel="icon" type="image/png"
-    href="./Icone%20Flandres%20Cave%20de%20R%C3%A9coltants.png">
+        href="./Icone%20Flandres%20Cave%20de%20R%C3%A9coltants.png">
 
   <link rel="apple-touch-icon"
-    href="./Icone%20Flandres%20Cave%20de%20R%C3%A9coltants.png">
+        href="./Icone%20Flandres%20Cave%20de%20R%C3%A9coltants.png">
 
   <link rel="manifest" href="./boutique.webmanifest">
 
   <meta name="theme-color" content="#17120f">
 
-  <meta http-equiv="refresh"
-    content="30;url=https://flandrescavederecoltants.hiboutik.com/shop/">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 25px;
+      background: #17120f;
+      color: #f4e9dc;
+      font-family: Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .contenu {
+      width: 100%;
+      max-width: 390px;
+    }
+
+    .logo {
+      width: 130px;
+      height: 130px;
+      object-fit: contain;
+      border-radius: 20px;
+    }
+
+    h1 {
+      color: #e9b779;
+      font-size: 23px;
+      margin: 20px 0 12px;
+    }
+
+    p {
+      line-height: 1.6;
+    }
+
+    .instructions {
+      margin: 25px 0;
+      padding: 18px;
+      border: 1px solid #9e7045;
+      border-radius: 14px;
+      background: #261d18;
+      line-height: 1.8;
+    }
+
+    .bouton {
+      display: block;
+      padding: 15px;
+      margin-top: 15px;
+      border-radius: 10px;
+      background: #c98742;
+      color: #17120f;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .secondaire {
+      background: transparent;
+      border: 1px solid #c98742;
+      color: #e9b779;
+    }
+
+    .petit {
+      color: #cbb7a5;
+      font-size: 13px;
+    }
+  </style>
 </head>
 
-<body style="margin:0;min-height:100vh;display:flex;
-  align-items:center;justify-content:center;
-  background:#17120f;color:#e9b779;
-  font-family:Arial,sans-serif;text-align:center;">
+<body>
+  <main class="contenu">
 
-  <div>
     <img
+      class="logo"
       src="./Icone%20Flandres%20Cave%20de%20R%C3%A9coltants.png"
-      alt="Flandres Cave de Récoltants"
-      style="width:120px;height:120px;object-fit:contain;
-      border-radius:20px;">
+      alt="Logo Flandres Cave de Récoltants">
 
-    <p>Ouverture de votre cave… 🍷</p>
+    <div id="installation">
+      <h1>Votre cave à portée de main 🍷</h1>
 
-    <p>
-      <a href="https://flandrescavederecoltants.hiboutik.com/shop/"
-         style="color:#e9b779;">
-        Accéder à la boutique
+      <p>
+        Ajoutez Flandres Cave de Récoltants
+        à l'écran d'accueil de votre téléphone.
+      </p>
+
+      <div class="instructions">
+        <strong>Sur Firefox Android :</strong>
+        <div>1. Appuyez sur le menu ⋮</div>
+        <div>2. Choisissez « Ajouter à l'écran d'accueil »</div>
+        <div>3. Confirmez l'ajout de notre logo</div>
+      </div>
+
+      <a class="bouton" id="boutonInstalle"
+         href="https://flandrescavederecoltants.hiboutik.com/shop/">
+        J'ai ajouté le raccourci ✓
       </a>
-    </p>
-  </div>
+
+      <a class="bouton secondaire"
+         href="https://flandrescavederecoltants.hiboutik.com/shop/">
+        Continuer vers la boutique
+      </a>
+
+      <p class="petit">
+        L'installation est facultative.
+        Vous pouvez toujours visiter notre boutique.
+      </p>
+    </div>
+
+    <div id="redirection" hidden>
+      <h1>Bienvenue dans votre cave 🍷</h1>
+      <p>Ouverture de la boutique…</p>
+
+      <a class="bouton"
+         href="https://flandrescavederecoltants.hiboutik.com/shop/">
+        Ouvrir la boutique
+      </a>
+    </div>
+
+  </main>
 
   <script>
-    setTimeout(function () {
-      window.location.replace(
-        "https://flandrescavederecoltants.hiboutik.com/shop/"
-      );
-    }, 30000);
+    const boutique =
+      "https://flandrescavederecoltants.hiboutik.com/shop/";
+
+    const params = new URLSearchParams(window.location.search);
+
+    const raccourciInstalle =
+      localStorage.getItem("flandresRaccourciInstalle") === "oui";
+
+    const modeInstallation = params.has("installer");
+
+    if (raccourciInstalle && !modeInstallation) {
+      document.getElementById("installation").hidden = true;
+      document.getElementById("redirection").hidden = false;
+
+      window.location.replace(boutique);
+    }
+
+    document.getElementById("boutonInstalle")
+      .addEventListener("click", function () {
+        localStorage.setItem(
+          "flandresRaccourciInstalle", "oui"
+        );
+      });
   </script>
 </body>
 </html>
