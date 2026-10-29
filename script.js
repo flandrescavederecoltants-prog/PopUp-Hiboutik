@@ -2,17 +2,17 @@
 (() => {
   const start = () => {
 
-    // ==========================================
-    // CONFIGURATION DU VIN DE LA SEMAINE
-    // ==========================================
+    // =====================================
+    // CONFIGURATION
+    // =====================================
 
     const img = "https://flandrescavederecoltants.hiboutik.com/shop/image.php?img=big_1074-1.jpg";
     const wine = "https://flandrescavederecoltants.hiboutik.com/shop/?page=product&id=1074";
     const shop = "https://flandrescavederecoltants.hiboutik.com/shop/?page=products";
 
-    // ==========================================
+    // =====================================
     // POPUP VIN DE LA SEMAINE
-    // ==========================================
+    // =====================================
 
     let n = (+sessionStorage.getItem("pageCount") || 0) + 1;
     sessionStorage.setItem("pageCount", n);
@@ -21,7 +21,6 @@
       n % 4 === 1 &&
       !document.getElementById("customPopupOverlay")
     ) {
-
       const popup = document.createElement("div");
       popup.id = "customPopupOverlay";
 
@@ -181,7 +180,6 @@
         </style>
 
         <div id="pvBox">
-
           <div id="pvImageZone">
             <img
               id="pvImage"
@@ -191,14 +189,12 @@
           </div>
 
           <div id="pvContent">
-
             <h2 id="pvTitle">
               ⚠️ Chaque Semaine, Opération
               1 Semaine / 1 Vin ⚠️
             </h2>
 
             <div id="pvButtons">
-
               <button id="pvA">
                 Le Vin de la Semaine
               </button>
@@ -206,19 +202,15 @@
               <button id="pvS">
                 Vers le Site
               </button>
-
             </div>
-
           </div>
 
           <div id="pvX">✖</div>
-
         </div>
       `;
 
       document.body.appendChild(popup);
 
-      // Fermeture automatique après 20 secondes
       setTimeout(() => popup.remove(), 20000);
 
       popup.addEventListener("click", e => {
@@ -236,9 +228,9 @@
       });
     }
 
-    // ==========================================
-    // FORMULAIRE DE CONTACT EMAILJS
-    // ==========================================
+    // =====================================
+    // FORMULAIRE DE CONTACT
+    // =====================================
 
     if (document.getElementById("customContactButton")) {
       return;
@@ -276,11 +268,13 @@
         padding:12px 18px;
         border-radius:8px 0 0 8px;
         cursor:grab;
-        z-index:999999;
+        z-index:1000001;
         font-weight:bold;
-        touch-action:none;
+        touch-action:none !important;
+        -ms-touch-action:none;
         user-select:none;
         -webkit-user-select:none;
+        -webkit-touch-callout:none;
         box-sizing:border-box;
       `;
 
@@ -289,7 +283,7 @@
         inset:0;
         background:#0009;
         display:none;
-        z-index:999999;
+        z-index:1000002;
       `;
 
       contactOverlay.innerHTML = `
@@ -365,24 +359,22 @@
             ">
               Envoyer
             </button>
-
           </div>
         </div>
       `;
 
       document.body.append(button, contactOverlay);
 
-      // ==========================================
-      // ONGLET FLOTTANT DÉPLAÇABLE
-      // SOURIS + ÉCRAN TACTILE
-      // ==========================================
+      // =====================================
+      // DÉPLACEMENT TACTILE ET SOURIS
+      // =====================================
 
       const positionKey = "contactButtonPosition";
 
       const clamp = (value, min, max) =>
         Math.max(min, Math.min(value, max));
 
-      function positionButton(x, y) {
+      function moveButton(x, y) {
         const maxX = Math.max(
           0,
           window.innerWidth - button.offsetWidth
@@ -403,148 +395,192 @@
           clamp(y, 0, maxY) + "px";
       }
 
-      // Récupération de la position mémorisée
-      let savedPosition = null;
+      function savePosition() {
+        try {
+          localStorage.setItem(
+            positionKey,
+            JSON.stringify({
+              x: parseFloat(button.style.left),
+              y: parseFloat(button.style.top)
+            })
+          );
+        } catch (e) {}
+      }
 
+      // Restaurer la position précédente
       try {
-        savedPosition = JSON.parse(
+        const saved = JSON.parse(
           localStorage.getItem(positionKey)
         );
-      } catch (e) {
-        savedPosition = null;
-      }
-
-      if (
-        savedPosition &&
-        Number.isFinite(savedPosition.x) &&
-        Number.isFinite(savedPosition.y)
-      ) {
-        positionButton(
-          savedPosition.x,
-          savedPosition.y
-        );
-      }
-
-      let drag = null;
-      let suppressClick = false;
-
-      // Début du déplacement
-      button.addEventListener("pointerdown", e => {
 
         if (
-          e.pointerType === "mouse" &&
-          e.button !== 0
+          saved &&
+          Number.isFinite(saved.x) &&
+          Number.isFinite(saved.y)
         ) {
-          return;
+          moveButton(saved.x, saved.y);
         }
+      } catch (e) {}
 
+      let drag = null;
+      let ignoreClick = false;
+
+      function beginDrag(x, y, type) {
         const rect = button.getBoundingClientRect();
 
         drag = {
-          id: e.pointerId,
-          startX: e.clientX,
-          startY: e.clientY,
+          type,
+          startX: x,
+          startY: y,
           left: rect.left,
           top: rect.top,
           moved: false
         };
+      }
 
-        button.setPointerCapture(e.pointerId);
-        button.style.cursor = "grabbing";
-      });
+      function updateDrag(x, y) {
+        if (!drag) return;
 
-      // Déplacement souris ou doigt
-      button.addEventListener("pointermove", e => {
+        const dx = x - drag.startX;
+        const dy = y - drag.startY;
 
-        if (!drag || e.pointerId !== drag.id) {
-          return;
-        }
-
-        const dx = e.clientX - drag.startX;
-        const dy = e.clientY - drag.startY;
-
-        if (Math.hypot(dx, dy) > 6) {
+        if (Math.hypot(dx, dy) > 5) {
           drag.moved = true;
         }
 
-        if (!drag.moved) {
-          return;
+        if (drag.moved) {
+          moveButton(
+            drag.left + dx,
+            drag.top + dy
+          );
         }
+      }
 
-        positionButton(
-          drag.left + dx,
-          drag.top + dy
-        );
-      });
-
-      // Fin du déplacement
-      function finishDrag(e) {
-
-        if (!drag || e.pointerId !== drag.id) {
-          return;
-        }
+      function endDrag() {
+        if (!drag) return;
 
         if (drag.moved) {
-
-          suppressClick = true;
-
-          try {
-            localStorage.setItem(
-              positionKey,
-              JSON.stringify({
-                x: parseFloat(button.style.left),
-                y: parseFloat(button.style.top)
-              })
-            );
-          } catch (error) {
-            // Le déplacement fonctionne même
-            // si le stockage est indisponible.
-          }
+          ignoreClick = true;
+          savePosition();
         }
 
         drag = null;
         button.style.cursor = "grab";
       }
 
-      button.addEventListener(
-        "pointerup",
-        finishDrag
-      );
+      // =====================================
+      // GESTION SPÉCIFIQUE SMARTPHONE
+      // =====================================
 
-      button.addEventListener(
-        "pointercancel",
-        finishDrag
-      );
+      let activeTouchId = null;
 
-      // Simple clic ou appui : ouvrir le formulaire
+      button.addEventListener("touchstart", e => {
+        if (drag || e.touches.length !== 1) return;
+
+        const t = e.changedTouches[0];
+        activeTouchId = t.identifier;
+
+        beginDrag(t.clientX, t.clientY, "touch");
+        button.style.cursor = "grabbing";
+      }, { passive: true });
+
+      button.addEventListener("touchmove", e => {
+        if (!drag || drag.type !== "touch") return;
+
+        const t = Array.from(e.changedTouches).find(
+          touch => touch.identifier === activeTouchId
+        );
+
+        if (!t) return;
+
+        updateDrag(t.clientX, t.clientY);
+
+        if (drag.moved && e.cancelable) {
+          e.preventDefault();
+        }
+      }, { passive: false });
+
+      button.addEventListener("touchend", e => {
+        if (!drag || drag.type !== "touch") return;
+
+        const t = Array.from(e.changedTouches).find(
+          touch => touch.identifier === activeTouchId
+        );
+
+        if (!t) return;
+
+        const moved = drag.moved;
+        endDrag();
+        activeTouchId = null;
+
+        if (!moved) {
+          contactOverlay.style.display = "block";
+          ignoreClick = true;
+        }
+
+        if (e.cancelable) e.preventDefault();
+      }, { passive: false });
+
+      button.addEventListener("touchcancel", () => {
+        if (drag && drag.type === "touch") {
+          endDrag();
+        }
+        activeTouchId = null;
+      });
+
+      // =====================================
+      // GESTION SOURIS ORDINATEUR
+      // =====================================
+
+      button.addEventListener("mousedown", e => {
+        if (e.button !== 0) return;
+
+        beginDrag(e.clientX, e.clientY, "mouse");
+        button.style.cursor = "grabbing";
+
+        e.preventDefault();
+      });
+
+      document.addEventListener("mousemove", e => {
+        if (!drag || drag.type !== "mouse") return;
+
+        updateDrag(e.clientX, e.clientY);
+      });
+
+      document.addEventListener("mouseup", () => {
+        if (drag && drag.type === "mouse") {
+          endDrag();
+        }
+      });
+
+      // =====================================
+      // CLIC NORMAL : OUVRIR LE FORMULAIRE
+      // =====================================
+
       button.addEventListener("click", e => {
-
-        if (suppressClick) {
-          suppressClick = false;
+        if (ignoreClick) {
+          ignoreClick = false;
           e.preventDefault();
           return;
         }
 
-        contactOverlay.style.display = "block";
-      });
-
-      // Repositionnement lors d'un changement
-      // de taille ou d'orientation de l'écran
-      window.addEventListener("resize", () => {
-
-        if (button.style.left) {
-          const rect = button.getBoundingClientRect();
-
-          positionButton(
-            rect.left,
-            rect.top
-          );
+        if (!drag) {
+          contactOverlay.style.display = "block";
         }
       });
 
-      // ==========================================
-      // GESTION DU FORMULAIRE DE CONTACT
-      // ==========================================
+      // Garder l'onglet dans l'écran
+      window.addEventListener("resize", () => {
+        if (button.style.left) {
+          const rect = button.getBoundingClientRect();
+          moveButton(rect.left, rect.top);
+          savePosition();
+        }
+      });
+
+      // =====================================
+      // ENVOI DU FORMULAIRE EMAILJS
+      // =====================================
 
       contactOverlay.addEventListener("click", e => {
 
@@ -586,10 +622,6 @@
     document.head.appendChild(script);
   };
 
-  // ==========================================
-  // DÉMARRAGE DU SCRIPT
-  // ==========================================
-
   if (document.readyState === "loading") {
     document.addEventListener(
       "DOMContentLoaded",
@@ -598,5 +630,4 @@
   } else {
     start();
   }
-
 })();
