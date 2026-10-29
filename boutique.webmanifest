@@ -1,1 +1,19 @@
 
+{
+  "name": "Flandres Cave de Récoltants",
+  "short_name": "Flandres Cave",
+  "start_url": "./boutique.html",
+  "scope": "./",
+  "display": "browser",
+  "background_color": "#17120f",
+  "theme_color": "#17120f",
+  "icons": [
+    {
+      "src": "./Icone%20Flandres%20Cave%20de%20R%C3%A9coltants.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
+
