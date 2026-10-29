@@ -250,10 +250,11 @@
 
     // =====================================
     // INVITATION ECRAN D'ACCUEIL (MOBILE)
+    // Le raccourci avec logo se crée depuis le pont GitHub.
     // =====================================
 
+    const installUrl = "https://flandrescavederecoltants-prog.github.io/PopUp-Hiboutik/boutique.html?installer=1";
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       window.navigator.standalone === true;
@@ -268,37 +269,15 @@
       sessionStorage.getItem(shownThisVisitKey) !== "yes" &&
       !document.getElementById("flandresInstallInvite")
     ) {
-
-      const ua = navigator.userAgent;
-      const isIOS = /iPhone|iPad|iPod/i.test(ua);
-      const isFirefox = /Firefox|FxiOS/i.test(ua);
-      const isChrome = /Chrome|CriOS/i.test(ua) && !isFirefox;
-
-      let instructions;
-
-      if (isIOS) {
-        instructions =
-          "Sur iPhone : ouvrez cette boutique dans Safari, touchez Partager (carré avec flèche), puis « Sur l’écran d’accueil » et « Ajouter ».";
-      } else if (isFirefox) {
-        instructions =
-          "Sur Firefox Android : ouvrez le menu ⋮, puis choisissez « Ajouter à l’écran d’accueil » (le libellé peut varier).";
-      } else if (isChrome) {
-        instructions =
-          "Sur Chrome Android : ouvrez le menu ⋮, puis « Ajouter à l’écran d’accueil » ou « Installer l’application ».";
-      } else {
-        instructions =
-          "Ouvrez le menu de votre navigateur et choisissez « Ajouter à l’écran d’accueil » si cette option est disponible.";
-      }
+      const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+      const instructions = isIOS
+        ? "Ouvrez notre page d'installation dans Safari, puis utilisez Partager → Sur l'écran d'accueil."
+        : "Ouvrez notre page d'installation, puis utilisez le menu de votre navigateur → Ajouter à l'écran d'accueil. Votre raccourci affichera notre logo Flandres.";
 
       const invite = document.createElement("div");
-
       invite.id = "flandresInstallInvite";
       invite.setAttribute("role", "dialog");
-      invite.setAttribute(
-        "aria-label",
-        "Ajouter la boutique à l'écran d'accueil"
-      );
-
+      invite.setAttribute("aria-label", "Installer le raccourci Flandres");
       invite.style.cssText = `
         position:fixed;
         bottom:16px;
@@ -318,109 +297,50 @@
       `;
 
       invite.innerHTML = `
-        <div style="
-          display:flex;
-          align-items:center;
-          gap:12px;
-          margin-bottom:10px;
-        ">
-          <img
-            src="${iconUrl}"
-            alt="Logo Flandres"
-            style="
-              width:54px;
-              height:54px;
-              object-fit:contain;
-              border-radius:10px;
-              flex-shrink:0;
-            "
-          >
-
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+          <img src="${iconUrl}" alt="Logo Flandres"
+            style="width:54px;height:54px;object-fit:contain;border-radius:10px;flex-shrink:0;">
           <div>
-            <strong style="font-size:15px">
-              🍷 Flandres Cave de Récoltants
-            </strong>
-            <div>
-              Retrouvez notre boutique sur votre écran d’accueil !
-            </div>
+            <strong style="font-size:15px">🍷 Flandres Cave de Récoltants</strong>
+            <div>Retrouvez notre boutique sur l'écran d'accueil avec notre vrai logo !</div>
           </div>
         </div>
-
-        <p style="margin:0 0 12px">
-          ${instructions}
-        </p>
-
-        <div style="
-          display:flex;
-          flex-wrap:wrap;
-          gap:8px;
-          justify-content:flex-end;
-        ">
-          <button
-            type="button"
-            id="flandresLater"
-            style="
-              background:#444;
-              color:white;
-              border:0;
-              border-radius:6px;
-              padding:10px;
-              cursor:pointer;
-            "
-          >
+        <p style="margin:0 0 12px">${instructions}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;">
+          <button type="button" id="flandresLater"
+            style="background:#444;color:white;border:0;border-radius:6px;padding:10px;cursor:pointer;">
             Plus tard
           </button>
-
-          <button
-            type="button"
-            id="flandresAlready"
-            style="
-              background:#ff5722;
-              color:white;
-              border:0;
-              border-radius:6px;
-              padding:10px;
-              cursor:pointer;
-            "
-          >
+          <button type="button" id="flandresAlready"
+            style="background:#444;color:white;border:0;border-radius:6px;padding:10px;cursor:pointer;">
             Déjà ajouté ✓
           </button>
+          <a id="flandresInstallLink" href="${installUrl}"
+            style="display:inline-block;background:#ff5722;color:white;border:0;border-radius:6px;padding:10px;text-decoration:none;font-weight:bold;text-align:center;">
+            🍷 Installer notre logo
+          </a>
         </div>
       `;
 
-      // Une seule invitation par session.
-      // Le popup du vin reste prioritaire.
-
+      // Une invitation par session ; le popup du vin est prioritaire.
       const showInvite = () => {
-
-        if (document.getElementById("flandresInstallInvite")) {
-          return;
-        }
-
+        if (document.getElementById("flandresInstallInvite")) return;
         if (document.getElementById("customPopupOverlay")) {
           setTimeout(showInvite, 1500);
           return;
         }
-
-        if (localStorage.getItem(alreadyAddedKey) === "yes") {
-          return;
-        }
+        if (localStorage.getItem(alreadyAddedKey) === "yes") return;
 
         sessionStorage.setItem(shownThisVisitKey, "yes");
         document.body.appendChild(invite);
 
-        invite
-          .querySelector("#flandresLater")
-          .addEventListener("click", () => {
-            invite.remove();
-          });
-
-        invite
-          .querySelector("#flandresAlready")
-          .addEventListener("click", () => {
-            localStorage.setItem(alreadyAddedKey, "yes");
-            invite.remove();
-          });
+        invite.querySelector("#flandresLater").addEventListener("click", () => {
+          invite.remove();
+        });
+        invite.querySelector("#flandresAlready").addEventListener("click", () => {
+          localStorage.setItem(alreadyAddedKey, "yes");
+          invite.remove();
+        });
       };
 
       setTimeout(showInvite, 4000);
