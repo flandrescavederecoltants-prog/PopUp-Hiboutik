@@ -1023,8 +1023,10 @@
 
 })();
 
+
 /* ============================================
    FLANDRES — BOUTON FLOTTANT INSTALLER
+   VERSION DEPLACABLE + SAJAB
    ============================================ */
 
 (function () {
@@ -1033,26 +1035,35 @@
   const INSTALL_URL =
     "https://flandrescavederecoltants-prog.github.io/PopUp-Hiboutik/boutique.html?reinstaller=1";
 
+  const BOUTON_ID = "flandres-install-float";
+  const CLE_POSITION = "flandresInstallBoutonPositionV1";
+  const MARGE = 8;
+  const SEUIL_GLISSEMENT = 7;
+
   function ajouterBoutonInstallation() {
-    // Évite les doublons si le script est chargé plusieurs fois.
-    if (document.getElementById("flandres-install-float")) return;
+    if (document.getElementById(BOUTON_ID)) return;
 
     const bouton = document.createElement("a");
-    bouton.id = "flandres-install-float";
+
+    bouton.id = BOUTON_ID;
     bouton.href = INSTALL_URL;
     bouton.target = "_blank";
     bouton.rel = "noopener noreferrer";
     bouton.textContent = "📲 Installer";
+
     bouton.setAttribute(
       "aria-label",
       "Installer ou réinstaller le raccourci Flandres"
     );
+
     bouton.title = "Installer la boutique sur mon téléphone";
 
     Object.assign(bouton.style, {
       position: "fixed",
-      right: "12px",
-      bottom: "90px",
+      left: "0px",
+      top: "0px",
+      right: "auto",
+      bottom: "auto",
       zIndex: "2147483646",
       display: "flex",
       alignItems: "center",
@@ -1067,20 +1078,201 @@
       fontWeight: "bold",
       textDecoration: "none",
       boxShadow: "0 3px 12px rgba(0,0,0,0.22)",
-      cursor: "pointer",
-      whiteSpace: "nowrap"
+      cursor: "grab",
+      whiteSpace: "nowrap",
+      userSelect: "none",
+      WebkitUserSelect: "none",
+      touchAction: "none",
+      WebkitTapHighlightColor: "transparent"
     });
 
     document.body.appendChild(bouton);
+
+    let x = 0;
+    let y = 0;
+    let positionInitialisee = false;
+
+    function limiter(valeur, minimum, maximum) {
+      return Math.max(minimum, Math.min(valeur, maximum));
+    }
+
+    // SAJAB : garde toujours le bouton dans l'écran.
+    function securiserPosition(nouveauX, nouveauY) {
+      const largeur = bouton.offsetWidth;
+      const hauteur = bouton.offsetHeight;
+
+      const maximumX = Math.max(
+        MARGE,
+        window.innerWidth - largeur - MARGE
+      );
+
+      const maximumY = Math.max(
+        MARGE,
+        window.innerHeight - hauteur - MARGE
+      );
+
+      x = limiter(nouveauX, MARGE, maximumX);
+      y = limiter(nouveauY, MARGE, maximumY);
+
+      bouton.style.left = x + "px";
+      bouton.style.top = y + "px";
+    }
+
+    function memoriserPosition() {
+      try {
+        localStorage.setItem(
+          CLE_POSITION,
+          JSON.stringify({
+            x: x,
+            y: y
+          })
+        );
+      } catch (erreur) {
+        // Le bouton reste utilisable sans stockage.
+      }
+    }
+
+    function restaurerPosition() {
+      let position = null;
+
+      try {
+        const valeur = localStorage.getItem(CLE_POSITION);
+
+        if (valeur) {
+          position = JSON.parse(valeur);
+        }
+      } catch (erreur) {
+        position = null;
+      }
+
+      if (
+        position &&
+        Number.isFinite(position.x) &&
+        Number.isFinite(position.y)
+      ) {
+        securiserPosition(position.x, position.y);
+      } else {
+        // Position initiale : bas à droite.
+        securiserPosition(
+          window.innerWidth - bouton.offsetWidth - 12,
+          window.innerHeight - bouton.offsetHeight - 90
+        );
+      }
+
+      positionInitialisee = true;
+    }
+
+    restaurerPosition();
+
+    let glissement = null;
+    let bloquerProchainClic = false;
+
+    bouton.addEventListener("pointerdown", function (evenement) {
+      if (evenement.button !== 0) return;
+
+      glissement = {
+        id: evenement.pointerId,
+        departX: evenement.clientX,
+        departY: evenement.clientY,
+        positionX: x,
+        positionY: y,
+        deplace: false
+      };
+
+      bouton.style.cursor = "grabbing";
+
+      try {
+        bouton.setPointerCapture(evenement.pointerId);
+      } catch (erreur) {
+        // Certains navigateurs peuvent refuser la capture.
+      }
+    });
+
+    bouton.addEventListener("pointermove", function (evenement) {
+      if (
+        !glissement ||
+        evenement.pointerId !== glissement.id
+      ) {
+        return;
+      }
+
+      const differenceX =
+        evenement.clientX - glissement.departX;
+
+      const differenceY =
+        evenement.clientY - glissement.departY;
+
+      const distance = Math.hypot(
+        differenceX,
+        differenceY
+      );
+
+      if (
+        !glissement.deplace &&
+        distance < SEUIL_GLISSEMENT
+      ) {
+        return;
+      }
+
+      glissement.deplace = true;
+
+      securiserPosition(
+        glissement.positionX + differenceX,
+        glissement.positionY + differenceY
+      );
+    });
+
+    function terminerGlissement(evenement) {
+      if (
+        !glissement ||
+        evenement.pointerId !== glissement.id
+      ) {
+        return;
+      }
+
+      if (glissement.deplace) {
+        bloquerProchainClic = true;
+        memoriserPosition();
+      }
+
+      glissement = null;
+      bouton.style.cursor = "grab";
+    }
+
+    bouton.addEventListener(
+      "pointerup",
+      terminerGlissement
+    );
+
+    bouton.addEventListener(
+      "pointercancel",
+      terminerGlissement
+    );
+
+    // Un glissement ne doit pas ouvrir la page.
+    bouton.addEventListener("click", function (evenement) {
+      if (bloquerProchainClic) {
+        evenement.preventDefault();
+        bloquerProchainClic = false;
+      }
+    });
+
+    // SAJAB : protection lors d'une rotation du téléphone.
+    window.addEventListener("resize", function () {
+      if (!positionInitialisee) return;
+
+      securiserPosition(x, y);
+      memoriserPosition();
+    });
   }
 
   if (document.readyState === "loading") {
     document.addEventListener(
       "DOMContentLoaded",
-      ajouterBoutonInstallation
+      ajouterBoutonInstallation,
+      { once: true }
     );
   } else {
     ajouterBoutonInstallation();
   }
 })();
-
