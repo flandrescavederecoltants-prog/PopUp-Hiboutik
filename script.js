@@ -519,7 +519,7 @@ button.innerHTML = `
     height:100% !important;
     margin:0 !important;
     padding:0 !important;
-    transform:translateY(-4px) !important;
+    transform:translateY(-2px) !important;
     display:flex !important;
     flex-direction:column !important;
     align-items:center !important;
