@@ -1103,6 +1103,14 @@ button.style.cssText = `
 (function () {
   "use strict";
 
+    // Bouton Installer réservé aux smartphones.
+  const estSmartphone =
+    /Android.*Mobile|iPhone|iPod/i.test(
+      navigator.userAgent
+    );
+
+  if (!estSmartphone) return;
+
   const INSTALL_URL =
     "https://flandrescavederecoltants-prog.github.io/PopUp-Hiboutik/boutique.html?reinstaller=1";
 
