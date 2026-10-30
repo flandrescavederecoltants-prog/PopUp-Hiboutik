@@ -516,22 +516,50 @@ button.innerHTML = `
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    gap:1px;
-    transform:translateY(-2px);
+    gap:2px;
+    width:100%;
+    height:100%;
+    margin:0;
+    padding:0;
+    line-height:1;
   ">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="23"
+      height="23"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="white"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      style="
+        display:block;
+        flex-shrink:0;
+      "
+    >
+      <rect
+        x="2"
+        y="4"
+        width="20"
+        height="16"
+        rx="2"
+      />
+      <path d="m2 6 10 7 10-7" />
+    </svg>
+
     <span style="
-      font-size:24px;
-      line-height:1;
-    ">✉</span>
-    <span style="
+      display:block;
       font-family:Arial,sans-serif;
       font-size:10px;
       font-weight:bold;
-      line-height:1;
+      line-height:12px;
+      margin:0;
+      padding:0;
     ">Contact</span>
   </span>
 `;
-
 button.setAttribute(
   "aria-label",
   "Nous contacter"
