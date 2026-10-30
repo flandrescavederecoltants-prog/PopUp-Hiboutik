@@ -512,11 +512,24 @@
 button.id = "customContactButton";
 button.innerHTML = `
   <span style="
-    display:block;
-    font-size:27px;
-    line-height:1;
-    transform:translateY(-3px);
-  ">✉</span>
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:1px;
+    transform:translateY(-2px);
+  ">
+    <span style="
+      font-size:24px;
+      line-height:1;
+    ">✉</span>
+    <span style="
+      font-family:Arial,sans-serif;
+      font-size:10px;
+      font-weight:bold;
+      line-height:1;
+    ">Contact</span>
+  </span>
 `;
 
 button.setAttribute(
