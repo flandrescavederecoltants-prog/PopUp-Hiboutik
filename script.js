@@ -509,27 +509,44 @@
       const button = document.createElement("div");
       const overlay = document.createElement("div");
 
-      button.id = "customContactButton";
-      button.textContent = "📩 Nous contacter";
+button.id = "customContactButton";
+button.textContent = "✉";
 
-      button.style.cssText = `
-        position:fixed;
-        right:0;
-        top:50%;
-        transform:translateY(-50%);
-        background:#ff5722;
-        color:white;
-        padding:12px 18px;
-        border-radius:8px 0 0 8px;
-        cursor:grab;
-        z-index:1000001;
-        font-weight:bold;
-        touch-action:none !important;
-        user-select:none;
-        -webkit-user-select:none;
-        -webkit-touch-callout:none;
-        box-sizing:border-box;
-      `;
+button.setAttribute(
+  "aria-label",
+  "Nous contacter"
+);
+
+button.title = "Nous contacter";
+
+button.style.cssText = `
+  position:fixed;
+  right:8px;
+  top:50%;
+  transform:translateY(-50%);
+  background:#ff5722;
+  color:white;
+  width:56px;
+  height:56px;
+  padding:0;
+  border:2px solid white;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:Arial,sans-serif;
+  font-size:30px;
+  font-weight:bold;
+  line-height:1;
+  box-shadow:0 3px 12px rgba(0,0,0,0.25);
+  cursor:grab;
+  z-index:1000001;
+  touch-action:none !important;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+  box-sizing:border-box;
+`;
 
       overlay.style.cssText = `
         position:fixed;
