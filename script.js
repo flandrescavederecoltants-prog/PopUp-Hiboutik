@@ -1276,3 +1276,4 @@
     ajouterBoutonInstallation();
   }
 })();
+// Relance publication GitHub Pages - SAJAB
