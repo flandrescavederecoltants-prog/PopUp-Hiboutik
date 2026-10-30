@@ -512,17 +512,21 @@
 button.id = "customContactButton";
 button.innerHTML = `
   <span style="
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:2px;
-    width:100%;
-    height:100%;
-    margin:0;
-    padding:0;
-    line-height:1;
-  ">
+    position:absolute;
+left:50%;
+top:50%;
+transform:translate(-50%, -50%);
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+gap:2px;
+width:max-content;
+height:max-content;
+margin:0;
+padding:0;
+line-height:1;
+">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="23"
