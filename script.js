@@ -512,21 +512,22 @@
 button.id = "customContactButton";
 button.innerHTML = `
   <span style="
-    position:absolute;
-left:50%;
-top:50%;
-transform:translate(-50%, -50%);
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-gap:2px;
-width:max-content;
-height:max-content;
-margin:0;
-padding:0;
-line-height:1;
-">
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:100% !important;
+    height:100% !important;
+    margin:0 !important;
+    padding:0 !important;
+    transform:none !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:2px !important;
+    box-sizing:border-box !important;
+    pointer-events:none !important;
+  ">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="23"
@@ -539,32 +540,32 @@ line-height:1;
       stroke-linejoin="round"
       aria-hidden="true"
       style="
-        display:block;
-        flex-shrink:0;
+        display:block !important;
+        width:23px !important;
+        height:23px !important;
+        flex:none !important;
+        margin:0 !important;
+        padding:0 !important;
       "
     >
-      <rect
-        x="2"
-        y="4"
-        width="20"
-        height="16"
-        rx="2"
-      />
-      <path d="m2 6 10 7 10-7" />
+      <rect x="2" y="4" width="20" height="16" rx="2"/>
+      <path d="m2 6 10 7 10-7"/>
     </svg>
 
     <span style="
-      display:block;
-      font-family:Arial,sans-serif;
-      font-size:10px;
-      font-weight:bold;
-      line-height:12px;
-      margin:0;
-      padding:0;
+      display:block !important;
+      font-family:Arial,sans-serif !important;
+      font-size:10px !important;
+      font-weight:bold !important;
+      line-height:12px !important;
+      height:12px !important;
+      margin:0 !important;
+      padding:0 !important;
+      text-align:center !important;
+      flex:none !important;
     ">Contact</span>
   </span>
-`;
-button.setAttribute(
+`;button.setAttribute(
   "aria-label",
   "Nous contacter"
 );
