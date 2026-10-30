@@ -565,7 +565,8 @@ button.innerHTML = `
       flex:none !important;
     ">Contact</span>
   </span>
-`;button.setAttribute(
+`;
+      button.setAttribute(
   "aria-label",
   "Nous contacter"
 );
