@@ -510,7 +510,14 @@
       const overlay = document.createElement("div");
 
 button.id = "customContactButton";
-button.textContent = "✉";
+button.innerHTML = `
+  <span style="
+    display:block;
+    font-size:27px;
+    line-height:1;
+    transform:translateY(-3px);
+  ">✉</span>
+`;
 
 button.setAttribute(
   "aria-label",
