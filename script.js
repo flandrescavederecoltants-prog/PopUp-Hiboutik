@@ -1022,3 +1022,65 @@
   }
 
 })();
+
+/* ============================================
+   FLANDRES — BOUTON FLOTTANT INSTALLER
+   ============================================ */
+
+(function () {
+  "use strict";
+
+  const INSTALL_URL =
+    "https://flandrescavederecoltants-prog.github.io/PopUp-Hiboutik/boutique.html?reinstaller=1";
+
+  function ajouterBoutonInstallation() {
+    // Évite les doublons si le script est chargé plusieurs fois.
+    if (document.getElementById("flandres-install-float")) return;
+
+    const bouton = document.createElement("a");
+    bouton.id = "flandres-install-float";
+    bouton.href = INSTALL_URL;
+    bouton.target = "_blank";
+    bouton.rel = "noopener noreferrer";
+    bouton.textContent = "📲 Installer";
+    bouton.setAttribute(
+      "aria-label",
+      "Installer ou réinstaller le raccourci Flandres"
+    );
+    bouton.title = "Installer la boutique sur mon téléphone";
+
+    Object.assign(bouton.style, {
+      position: "fixed",
+      right: "12px",
+      bottom: "90px",
+      zIndex: "2147483646",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "10px 13px",
+      borderRadius: "24px",
+      background: "#29221D",
+      color: "#D9A36C",
+      border: "1px solid #D9A36C",
+      fontFamily: "Arial, sans-serif",
+      fontSize: "12px",
+      fontWeight: "bold",
+      textDecoration: "none",
+      boxShadow: "0 3px 12px rgba(0,0,0,0.22)",
+      cursor: "pointer",
+      whiteSpace: "nowrap"
+    });
+
+    document.body.appendChild(bouton);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener(
+      "DOMContentLoaded",
+      ajouterBoutonInstallation
+    );
+  } else {
+    ajouterBoutonInstallation();
+  }
+})();
+
