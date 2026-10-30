@@ -86,6 +86,40 @@
       line-height: 1.8;
     }
 
+    #etapesInstallation {
+      margin-top: 8px;
+    }
+
+    #etapesInstallation div {
+      margin-top: 5px;
+    }
+
+    .changer-navigateur {
+      display: block;
+      margin: 12px auto 0;
+      padding: 5px;
+      border: 0;
+      background: transparent;
+      color: #e9b779;
+      font-size: 13px;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .choix-navigateur {
+      margin-top: 12px;
+    }
+
+    .choix-navigateur select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      background: #17120f;
+      color: #f4e9dc;
+      border: 1px solid #9e7045;
+      font-size: 14px;
+    }
+
     .bouton {
       display: block;
       padding: 15px;
@@ -139,26 +173,64 @@
         à l'écran d'accueil de votre téléphone.
       </p>
 
+      <!-- INSTRUCTIONS ADAPTÉES AU NAVIGATEUR -->
+
       <div class="instructions">
 
-        <strong>
-          Sur Firefox Android :
+        <strong id="titreNavigateur">
+          Installation sur votre téléphone
         </strong>
 
-        <div>
-          1. Appuyez sur le menu ⋮
+        <div id="etapesInstallation">
+          Chargement des instructions…
         </div>
 
-        <div>
-          2. Choisissez
-          « Ajouter à l'écran d'accueil »
-        </div>
+        <button
+          type="button"
+          id="changerNavigateur"
+          class="changer-navigateur"
+          aria-expanded="false"
+          aria-controls="choixNavigateur"
+        >
+          Pas votre navigateur ?
+        </button>
 
-        <div>
-          3. Confirmez l'ajout de notre logo
+        <div
+          id="choixNavigateur"
+          class="choix-navigateur"
+          hidden
+        >
+
+          <select
+            id="navigateurChoisi"
+            aria-label="Choisir mon navigateur"
+          >
+            <option value="firefox">
+              Firefox Android
+            </option>
+
+            <option value="samsung">
+              Samsung Internet
+            </option>
+
+            <option value="chrome">
+              Chrome Android
+            </option>
+
+            <option value="safari">
+              Safari iPhone
+            </option>
+
+            <option value="autre">
+              Autre navigateur
+            </option>
+          </select>
+
         </div>
 
       </div>
+
+      <!-- CONFIRMATION D'INSTALLATION -->
 
       <a
         class="bouton"
@@ -187,7 +259,7 @@
     <div id="redirection" hidden>
 
       <h1>
-        Bienvenu dans votre cave 🍷
+        Bienvenue dans votre cave 🍷
       </h1>
 
       <p>
@@ -265,7 +337,7 @@
         window.navigator.standalone === true;
 
       // ======================================
-      // 5. LOGIQUE DE REDIRECTION CORRIGÉE
+      // 5. LOGIQUE DE REDIRECTION
       // ======================================
 
       // ?reinstaller=1 :
@@ -275,8 +347,7 @@
       //   Ouvre directement Hiboutik.
       //
       // Déjà installé :
-      //   Ouvre directement Hiboutik,
-      //   même avec ?installer=1.
+      //   Ouvre directement Hiboutik.
       //
       // Application autonome :
       //   Ouvre directement Hiboutik.
@@ -327,6 +398,208 @@
             // La navigation vers Hiboutik
             // reste possible.
           }
+
+        }
+      );
+
+      // ======================================
+      // 7. INSTRUCTIONS SELON LE NAVIGATEUR
+      // ======================================
+
+      const titreNavigateur =
+        document.getElementById(
+          "titreNavigateur"
+        );
+
+      const etapesInstallation =
+        document.getElementById(
+          "etapesInstallation"
+        );
+
+      const changerNavigateur =
+        document.getElementById(
+          "changerNavigateur"
+        );
+
+      const choixNavigateur =
+        document.getElementById(
+          "choixNavigateur"
+        );
+
+      const navigateurChoisi =
+        document.getElementById(
+          "navigateurChoisi"
+        );
+
+      // ======================================
+      // 8. TEXTES D'INSTALLATION
+      // ======================================
+
+      const instructionsNavigateurs = {
+
+        firefox: {
+          titre: "Sur Firefox Android :",
+          etapes: [
+            "Ouvrez le menu ⋮ de Firefox.",
+            "Choisissez « Installer » ou « Ajouter à l'écran d'accueil ».",
+            "Confirmez l'ajout du raccourci."
+          ]
+        },
+
+        samsung: {
+          titre: "Sur Samsung Internet :",
+          etapes: [
+            "Ouvrez le menu en bas à droite.",
+            "Choisissez « Ajouter la page à », puis « Écran d'accueil ».",
+            "Confirmez l'ajout du raccourci."
+          ]
+        },
+
+        chrome: {
+          titre: "Sur Chrome Android :",
+          etapes: [
+            "Ouvrez le menu ⋮ de Chrome.",
+            "Choisissez « Ajouter à l'écran d'accueil » ou « Installer l'application ».",
+            "Confirmez l'ajout."
+          ]
+        },
+
+        safari: {
+          titre: "Sur Safari iPhone :",
+          etapes: [
+            "Touchez le bouton Partager.",
+            "Choisissez « Sur l'écran d'accueil ».",
+            "Touchez « Ajouter »."
+          ]
+        },
+
+        autre: {
+          titre: "Sur votre navigateur :",
+          etapes: [
+            "Ouvrez le menu ou le bouton Partager.",
+            "Cherchez « Ajouter à l'écran d'accueil ».",
+            "Confirmez l'ajout du raccourci."
+          ]
+        }
+
+      };
+
+      // ======================================
+      // 9. AFFICHAGE DES INSTRUCTIONS
+      // ======================================
+
+      function afficherInstructions(navigateur) {
+
+        const info =
+          instructionsNavigateurs[navigateur] ||
+          instructionsNavigateurs.autre;
+
+        titreNavigateur.textContent =
+          info.titre;
+
+        etapesInstallation.replaceChildren();
+
+        info.etapes.forEach((etape, index) => {
+
+          const ligne =
+            document.createElement("div");
+
+          ligne.textContent =
+            `${index + 1}. ${etape}`;
+
+          etapesInstallation.appendChild(
+            ligne
+          );
+
+        });
+      }
+
+      // ======================================
+      // 10. DÉTECTION DU NAVIGATEUR
+      // ======================================
+
+      function detecterNavigateur() {
+
+        const agent = navigator.userAgent;
+
+        // iPhone et iPad :
+        // Safari est proposé par défaut.
+        // Les autres navigateurs sont classés
+        // dans la catégorie générique.
+
+        if (/iPhone|iPad|iPod/i.test(agent)) {
+
+          if (
+            /CriOS|FxiOS|EdgiOS|OPiOS/i.test(agent)
+          ) {
+            return "autre";
+          }
+
+          return "safari";
+        }
+
+        // Samsung Internet doit être détecté
+        // avant Chrome, car sa signature peut
+        // également contenir "Chrome".
+
+        if (/SamsungBrowser/i.test(agent)) {
+          return "samsung";
+        }
+
+        if (/Firefox/i.test(agent)) {
+          return "firefox";
+        }
+
+        if (
+          /Chrome/i.test(agent) &&
+          !/EdgA|OPR|Opera/i.test(agent)
+        ) {
+          return "chrome";
+        }
+
+        return "autre";
+      }
+
+      // ======================================
+      // 11. INITIALISATION
+      // ======================================
+
+      const navigateurDetecte =
+        detecterNavigateur();
+
+      navigateurChoisi.value =
+        navigateurDetecte;
+
+      afficherInstructions(
+        navigateurDetecte
+      );
+
+      // ======================================
+      // 12. CHOIX MANUEL DU NAVIGATEUR
+      // ======================================
+
+      changerNavigateur.addEventListener(
+        "click",
+        () => {
+
+          choixNavigateur.hidden =
+            !choixNavigateur.hidden;
+
+          changerNavigateur.setAttribute(
+            "aria-expanded",
+            String(!choixNavigateur.hidden)
+          );
+
+        }
+      );
+
+      navigateurChoisi.addEventListener(
+        "change",
+        () => {
+
+          afficherInstructions(
+            navigateurChoisi.value
+          );
 
         }
       );
